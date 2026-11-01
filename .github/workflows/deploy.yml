@@ -1,0 +1,66 @@
+
+name: Deploy Leadhunter Backend
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Backend to Contabo
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Backend via SSH
+        uses: appleboy/ssh-action@master
+
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: 22
+          envs: ENV_FILE
+
+          script: |
+            set -e
+
+            echo "Starting Leadhunter Backend Deployment..."
+
+            cd /var/www/laadhunter/backend
+
+            echo "Pulling latest backend code..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "Creating production environment file..."
+            printf '%s\n' "$ENV_FILE" > .env
+            chmod 600 .env
+
+            echo "Installing dependencies..."
+            if [ -f package-lock.json ]; then
+              npm ci --omit=dev
+            else
+              npm install --omit=dev
+            fi
+
+            echo "Checking server.js..."
+            test -f server.js
+
+            echo "Starting or restarting PM2 process..."
+
+            if pm2 describe leadhunter-backend > /dev/null 2>&1; then
+              pm2 restart leadhunter-backend --update-env
+            else
+              pm2 start server.js --name leadhunter-backend
+            fi
+
+            pm2 save
+
+            echo "Leadhunter Backend Deployment Successful!"
+            pm2 status
