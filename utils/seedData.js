@@ -1,0 +1,60 @@
+// Default business categories and WhatsApp templates (Hinglish). Edit freely in the UI after seeding.
+const CATEGORIES = [
+  ['Hospitals', 'hospitals', ['hospital'], 'Hospital'],
+  ['Clinics', 'clinics', ['doctor'], 'Clinic'],
+  ['Dental Clinics', 'dental clinics', ['dentist'], 'Dental Clinic'],
+  ['Schools', 'schools', ['school'], 'School'],
+  ['Colleges', 'colleges', ['university'], 'College'],
+  ['Coaching Institutes', 'coaching institutes', [], 'School'],
+  ['Beauty Parlours', 'beauty parlours', ['beauty_salon'], 'Beauty Parlour'],
+  ['Salons', 'salons', ['hair_salon'], 'Salon'],
+  ['Restaurants', 'restaurants', ['restaurant'], 'Restaurant'],
+  ['Cafes', 'cafes', ['cafe'], 'Restaurant'],
+  ['Hotels', 'hotels', ['lodging'], 'Hotel'],
+  ['Marriage Gardens', 'marriage gardens', [], 'Hotel'],
+  ['Real Estate Dealers', 'real estate dealers', ['real_estate_agency'], 'Real Estate'],
+  ['Jewellery Shops', 'jewellery shops', ['jewelry_store'], 'E-commerce'],
+  ['Furniture Shops', 'furniture shops', ['furniture_store'], 'E-commerce'],
+  ['Gyms', 'gyms', ['gym'], 'General Business'],
+  ['Automobile Dealers', 'automobile dealers', ['car_dealer'], 'General Business'],
+  ['Medical Stores', 'medical stores', ['pharmacy'], 'Clinic'],
+  ['Travel Agencies', 'travel agencies', ['travel_agency'], 'General Business'],
+  ['Interior Designers', 'interior designers', [], 'General Business'],
+  ['Architects', 'architects', [], 'General Business'],
+  ['Photographers', 'photographers', [], 'General Business'],
+  ['Event Planners', 'event planners', [], 'General Business'],
+].map(([name, searchTerm, googleTypes, templateCategory]) => ({ name, searchTerm, googleTypes, templateCategory }));
+
+const SIGN = '\n\nDhanyavaad,\n{{developerName}}\nFull Stack Web Developer';
+const T = (name, category, body) => ({ name, category, body: body + SIGN, isDefault: true });
+
+const TEMPLATES = [
+  T('General Website Development Pitch', 'General Business',
+    'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon, ek Full Stack Web Developer.\n\nMain businesses ke liye professional, modern aur mobile-friendly websites develop karta hoon.\n\nMaine aapke business ke baare mein dekha. Agar aap apne business ko online grow karna chahte hain, toh main aapke liye ek professional website aur WhatsApp enquiry system develop kar sakta hoon.\n\nKya main aapko ek demo design dikha sakta hoon?'),
+  T('School Website & Admission Enquiry', 'School',
+    'Namaste {{businessName}} ke Principal/Management ji,\n\nMain {{developerName}} hoon. Main schools ke liye website banata hoon jisme admission enquiry form, notices, gallery aur parents ke liye WhatsApp contact hota hai.\n\n{{city}} mein kai parents ab school online dekhkar decide karte hain. Kya main aapko ek demo dikha sakta hoon?'),
+  T('College Website & Admissions', 'College',
+    'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Colleges ke liye main modern website banata hoon jisme courses, fees, admission form aur student enquiry system hota hai.\n\nKya main aapko ek chhota demo dikha sakta hoon?'),
+  T('Hospital Website & Appointment System', 'Hospital',
+    'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Main hospitals ke liye professional website banata hoon jisme doctors ki list, departments, emergency contact aur online appointment request hoti hai.\n\nKya main aapko ek demo dikha sakta hoon?'),
+  T('Clinic Online Appointment Website', 'Clinic',
+    'Namaste {{ownerName}} ji,\n\nMain {{developerName}} hoon. {{businessName}} ke liye main ek simple website bana sakta hoon jisme patients online appointment ke liye WhatsApp par seedha message kar sakein.\n\nKya main aapko demo dikha sakta hoon?'),
+  T('Dental Clinic Website', 'Dental Clinic',
+    'Namaste {{ownerName}} ji,\n\nMain {{developerName}} hoon. Dental clinics ke liye main website banata hoon jisme treatments, before/after gallery, patient reviews aur appointment booking hoti hai.\n\n{{businessName}} ke liye ek demo design dikhaun?'),
+  T('Salon Booking Website', 'Salon',
+    'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Salons ke liye main website banata hoon jisme services, price list, gallery aur WhatsApp booking button hota hai.\n\nKya main aapko demo dikha sakta hoon?'),
+  T('Beauty Parlour Website', 'Beauty Parlour',
+    'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Beauty parlour ke liye main ek khoobsurat mobile-friendly website banata hoon jisme packages, gallery aur WhatsApp appointment hoti hai.\n\nKya main ek demo bhej sakta hoon?'),
+  T('Restaurant Menu & Order Website', 'Restaurant',
+    'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Restaurants/cafes ke liye main website banata hoon jisme digital menu, photos, location aur WhatsApp par order/table booking hoti hai.\n\nKya main aapko demo dikha sakta hoon?'),
+  T('Hotel Booking Enquiry Website', 'Hotel',
+    'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Hotels aur marriage gardens ke liye main website banata hoon jisme rooms/halls ki photos, rates aur booking enquiry WhatsApp par seedha aati hai.\n\nKya main aapko ek demo dikha sakta hoon?'),
+  T('Real Estate Listings Website', 'Real Estate',
+    'Namaste {{ownerName}} ji,\n\nMain {{developerName}} hoon. Real estate dealers ke liye main property listing website banata hoon jisme photos, location aur buyer enquiry WhatsApp par aati hai.\n\n{{businessName}} ke liye demo dikhaun?'),
+  T('Online Store for Shops', 'E-commerce',
+    'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Main shops ke liye online catalogue/e-commerce website banata hoon taaki {{city}} ke bahar bhi customers aapka saman dekh aur order kar sakein.\n\nKya main aapko ek demo dikha sakta hoon?'),
+  T('Polite Follow-up', 'Follow-up',
+    'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Pichhli baar maine website ke baare mein baat ki thi. Bas yeh poochna tha ki kya aapko demo dekhne ka time mila?\n\nAgar abhi zaroorat nahi hai toh koi baat nahi, bataiye aur main dobara message nahi karunga.'),
+];
+
+module.exports = { CATEGORIES, TEMPLATES };
