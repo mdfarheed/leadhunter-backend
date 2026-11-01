@@ -18,14 +18,24 @@ jobs:
         uses: appleboy/ssh-action@master
 
         env:
-          ENV_FILE: ${{ secrets.ENV_FILE }}
+          ENV_PORT: ${{ secrets.PORT }}
+          ENV_NODE_ENV: ${{ secrets.NODE_ENV }}
+          ENV_MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          ENV_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          ENV_JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+          ENV_GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          ENV_FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          ENV_GOOGLE_STRICT_STORAGE: ${{ secrets.GOOGLE_STRICT_STORAGE }}
+          ENV_TRUST_PROXY: ${{ secrets.TRUST_PROXY }}
+          ENV_SERVE_FRONTEND: ${{ secrets.SERVE_FRONTEND }}
 
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: 22
-          envs: ENV_FILE
+
+          envs: ENV_PORT,ENV_NODE_ENV,ENV_MONGODB_URI,ENV_JWT_SECRET,ENV_JWT_EXPIRES_IN,ENV_GOOGLE_PLACES_API_KEY,ENV_FRONTEND_URL,ENV_GOOGLE_STRICT_STORAGE,ENV_TRUST_PROXY,ENV_SERVE_FRONTEND
 
           script: |
             set -e
@@ -34,15 +44,54 @@ jobs:
 
             cd /var/www/laadhunter/backend
 
-            echo "Pulling latest backend code..."
+            echo "Pulling latest code..."
+
             git fetch origin main
             git reset --hard origin/main
 
-            echo "Creating production environment file..."
-            printf '%s\n' "$ENV_FILE" > .env
+            echo "Validating GitHub Secrets..."
+
+            for name in \
+              ENV_PORT \
+              ENV_NODE_ENV \
+              ENV_MONGODB_URI \
+              ENV_JWT_SECRET \
+              ENV_JWT_EXPIRES_IN \
+              ENV_GOOGLE_PLACES_API_KEY \
+              ENV_FRONTEND_URL \
+              ENV_GOOGLE_STRICT_STORAGE \
+              ENV_TRUST_PROXY \
+              ENV_SERVE_FRONTEND
+            do
+              if [ -z "$(printenv "$name")" ]; then
+                echo "ERROR: Missing secret: $name"
+                exit 1
+              fi
+            done
+
+            echo "Creating .env file..."
+
+            umask 077
+
+            {
+              printf 'PORT=%s\n' "$ENV_PORT"
+              printf 'NODE_ENV=%s\n' "$ENV_NODE_ENV"
+              printf 'MONGODB_URI=%s\n' "$ENV_MONGODB_URI"
+              printf 'JWT_SECRET=%s\n' "$ENV_JWT_SECRET"
+              printf 'JWT_EXPIRES_IN=%s\n' "$ENV_JWT_EXPIRES_IN"
+              printf 'GOOGLE_PLACES_API_KEY=%s\n' "$ENV_GOOGLE_PLACES_API_KEY"
+              printf 'FRONTEND_URL=%s\n' "$ENV_FRONTEND_URL"
+              printf 'GOOGLE_STRICT_STORAGE=%s\n' "$ENV_GOOGLE_STRICT_STORAGE"
+              printf 'TRUST_PROXY=%s\n' "$ENV_TRUST_PROXY"
+              printf 'SERVE_FRONTEND=%s\n' "$ENV_SERVE_FRONTEND"
+            } > .env
+
             chmod 600 .env
 
+            echo ".env created successfully."
+
             echo "Installing dependencies..."
+
             if [ -f package-lock.json ]; then
               npm ci --omit=dev
             else
@@ -50,9 +99,10 @@ jobs:
             fi
 
             echo "Checking server.js..."
+
             test -f server.js
 
-            echo "Starting or restarting PM2 process..."
+            echo "Restarting PM2..."
 
             if pm2 describe leadhunter-backend > /dev/null 2>&1; then
               pm2 restart leadhunter-backend --update-env
@@ -62,5 +112,6 @@ jobs:
 
             pm2 save
 
-            echo "Leadhunter Backend Deployment Successful!"
+            echo "Deployment completed successfully!"
+
             pm2 status
