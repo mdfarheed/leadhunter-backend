@@ -18,11 +18,16 @@ if (env.trustProxy) app.set('trust proxy', 1);
 app.disable('x-powered-by');
 app.use(helmet());
 
-const origins = env.frontendUrl.split(',').map((s) => s.trim()).filter(Boolean);
-app.use(cors({
-  origin: (origin, cb) => (!origin || origins.includes(origin) ? cb(null, true) : cb(new Error('Not allowed by CORS'))),
+
+const corsOptions = {
+  origin: true,
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json({ limit: '1mb' }));
 app.use(sanitize);
 
