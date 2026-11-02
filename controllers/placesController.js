@@ -4,7 +4,8 @@ const SearchHistory = require('../models/SearchHistory');
 const Lead = require('../models/Lead');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiError = require('../utils/ApiError');
-const { getPreferences, getUsage, trackDiscovered } = require('../services/settingsService');
+const { getPreferences, getUsage, trackDiscovered, trackNoPhone } = require('../services/settingsService');
+const { checkPhone } = require('../utils/phone');
 
 // Abort the Google request if the browser cancels / disconnects.
 function abortOnClose(req, res) {
@@ -34,13 +35,26 @@ function applyFilters(list, b) {
   return out;
 }
 
-// Flags results that already exist as CRM leads (duplicate detection by Place ID).
-async function annotate(list) {
+// A business can only become a lead if Google returned a usable phone number for it. Computed here so the UI never has to guess.
+const NO_PHONE_MESSAGE = 'Phone number unavailable — this lead cannot be saved.';
+function phoneInfo(p, cc) {
+  const raw = p.phone || p.internationalPhone || '';
+  const check = checkPhone(raw, cc);
+  return check.ok
+    ? { phoneAvailable: true, canSave: true, saveBlockedReason: null }
+    : { phoneAvailable: Boolean(String(raw).trim()), canSave: false, saveBlockedReason: NO_PHONE_MESSAGE };
+}
+
+// Flags results that already exist as CRM leads (duplicate detection by Place ID) and whether each can be saved (phone present).
+async function annotate(list, cc) {
   const ids = list.map((p) => p.placeId);
   const saved = await Lead.find({ placeId: { $in: ids } }).select('placeId').lean();
   const map = new Map(saved.map((l) => [l.placeId, String(l._id)]));
-  return list.map((p) => ({ ...p, savedLeadId: map.get(p.placeId) || null }));
+  return list.map((p) => ({ ...p, ...phoneInfo(p, cc), savedLeadId: map.get(p.placeId) || null }));
 }
+
+// Counts results without a phone (only meaningful when phone fields were requested from Google).
+const countNoPhone = (list, cc, contactFetched) => (contactFetched ? list.filter((p) => !phoneInfo(p, cc).canSave).length : 0);
 
 const wantsContact = (b) => b.includeContact !== false || b.hasPhone === 'yes' || b.hasPhone === 'no' || b.hasWebsite === 'yes' || b.hasWebsite === 'no';
 
@@ -62,11 +76,15 @@ exports.textSearch = asyncHandler(async (req, res) => {
     query, pageToken: b.pageToken, pageSize: b.pageSize || 20, minRating: b.minRating,
     includeContact: wantsContact(b), includeRating: b.includeRating !== false, regionCode: ctx.regionCode,
   }, abortOnClose(req, res));
+  const prefs = await getPreferences();
   await trackDiscovered(result.places.length);
+  const contactFetched = wantsContact(b);
+  const noPhone = countNoPhone(result.places, prefs.defaultCountryCode, contactFetched);
+  await trackNoPhone({ discovered: noPhone });
   const filtered = applyFilters(result.places, b);
   let historyId = null;
   if (!b.pageToken) historyId = await recordHistory(req, { searchType: 'text', ctx, b, count: filtered.length, extra: { query } });
-  res.json({ places: await annotate(filtered), fetchedCount: result.places.length, nextPageToken: result.nextPageToken, query, historyId });
+  res.json({ places: await annotate(filtered, prefs.defaultCountryCode), fetchedCount: result.places.length, noPhoneCount: noPhone, contactFetched, nextPageToken: result.nextPageToken, query, historyId });
 });
 
 exports.nearbySearch = asyncHandler(async (req, res) => {
@@ -93,11 +111,15 @@ exports.nearbySearch = asyncHandler(async (req, res) => {
       includeRating: b.includeRating !== false, regionCode: ctx.regionCode, bias: { lat, lng, radius },
     }, signal);
   }
+  const prefs = await getPreferences();
   await trackDiscovered(result.places.length);
+  const contactFetched = wantsContact(b);
+  const noPhone = countNoPhone(result.places, prefs.defaultCountryCode, contactFetched);
+  await trackNoPhone({ discovered: noPhone });
   const filtered = applyFilters(result.places, b);
   let historyId = null;
   if (!b.pageToken) historyId = await recordHistory(req, { searchType: 'nearby', ctx, b, count: filtered.length, extra: { radius, latitude: lat, longitude: lng, mode } });
-  res.json({ places: await annotate(filtered), fetchedCount: result.places.length, nextPageToken: result.nextPageToken, center: { lat, lng, ...(center ? { name: center.name } : {}) }, mode, historyId });
+  res.json({ places: await annotate(filtered, prefs.defaultCountryCode), fetchedCount: result.places.length, noPhoneCount: noPhone, contactFetched, nextPageToken: result.nextPageToken, center: { lat, lng, ...(center ? { name: center.name } : {}) }, mode, historyId });
 });
 
 exports.details = asyncHandler(async (req, res) => {
@@ -105,7 +127,8 @@ exports.details = asyncHandler(async (req, res) => {
     includeContact: req.query.contact !== 'false', includeRating: req.query.rating !== 'false',
   }, abortOnClose(req, res));
   const saved = await Lead.findOne({ placeId: place.placeId }).select('_id').lean();
-  res.json({ place: { ...place, savedLeadId: saved ? String(saved._id) : null } });
+  const prefs = await getPreferences();
+  res.json({ place: { ...place, ...(req.query.contact !== 'false' ? phoneInfo(place, prefs.defaultCountryCode) : {}), savedLeadId: saved ? String(saved._id) : null } });
 });
 
 exports.resolveCity = asyncHandler(async (req, res) => {

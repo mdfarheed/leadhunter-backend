@@ -26,6 +26,14 @@ async function trackDiscovered(count) {
   if (!count) return;
   await AppSetting.findOneAndUpdate({ key: 'apiUsage' }, { $inc: { 'value.resultsDiscovered': count } }, { upsert: true }).catch(() => {});
 }
+// Discovery results that had no phone number (they cannot be saved as leads) and save attempts rejected for the same reason.
+async function trackNoPhone({ discovered = 0, rejectedSaves = 0 } = {}) {
+  const inc = {};
+  if (discovered) inc['value.resultsWithoutPhone'] = discovered;
+  if (rejectedSaves) inc['value.savesRejectedNoPhone'] = rejectedSaves;
+  if (!Object.keys(inc).length) return;
+  await AppSetting.findOneAndUpdate({ key: 'apiUsage' }, { $inc: inc }, { upsert: true }).catch(() => {});
+}
 async function getUsage() {
   const doc = await AppSetting.findOne({ key: 'apiUsage' }).lean();
   const v = doc?.value || {};
@@ -36,9 +44,10 @@ async function getUsage() {
   return {
     total: v.total || 0, textSearch: v.textSearch || 0, nearbySearch: v.nearbySearch || 0, details: v.details || 0,
     geocode: v.geocode || 0, errors: v.errors || 0, resultsDiscovered: v.resultsDiscovered || 0,
+    resultsWithoutPhone: v.resultsWithoutPhone || 0, savesRejectedNoPhone: v.savesRejectedNoPhone || 0,
     today: byDay[today] || 0, thisMonth: monthTotal,
     last14Days: Object.entries(byDay).sort(([a], [b]) => (a < b ? -1 : 1)).slice(-14).map(([date, count]) => ({ date, count })),
   };
 }
 
-module.exports = { getPreferences, savePreferences, trackUsage, trackDiscovered, getUsage, DEFAULT_PREFERENCES };
+module.exports = { getPreferences, savePreferences, trackUsage, trackDiscovered, trackNoPhone, getUsage, DEFAULT_PREFERENCES };

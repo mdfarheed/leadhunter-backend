@@ -1,0 +1,212 @@
+{
+ "general-business-1": [
+  "2c342c8a9fce9e70ffbe9d7fc09f694b149cd2ffe2e6d09643300955939560a3"
+ ],
+ "general-business-2": [
+  "fb31973270254472096c628cb906749b7e80ddb126b65081994d2dc1fbd24c51"
+ ],
+ "general-business-3": [
+  "6cae29b8c69e25bc2d2e840093033368880d9978d2df650eaa0b0fe5e69f2b47"
+ ],
+ "general-business-4": [
+  "ae2956134852d7ddf484dc08936f22d69e082781951233a05539aa4b72bf17b8"
+ ],
+ "general-business-5": [
+  "02f9b613027baf49c44e9a6361f715262768d10f2cfdeb185e7bfa223a77d148"
+ ],
+ "school-1": [
+  "1484edd63d432cb0175ab833a8e693f360d6a6c25f1716c398d19dc220ac7c74"
+ ],
+ "school-2": [
+  "470f0d790fda3ac288b5817f487d04d4167d970ef56f09593b2078120febbc13"
+ ],
+ "school-3": [
+  "ed5175dbce9e4403d2edf56efa27fd22f4fe51b4e8cdc9f4889f8bd15cb57f73"
+ ],
+ "school-4": [
+  "d4542ae26e032df74bd843c4e70c71ddfa6f78d4b8329f25845ed35b1a80204f"
+ ],
+ "school-5": [
+  "a42050ca98c7b6789e8c80f5fe0b3201e3c354ddb9111b3e78eb7bc6d69e271f"
+ ],
+ "college-1": [
+  "f8ae113b2fd592c6477295105e40c0564ae8a1fcdcc114f79f30a8eb7aeff717"
+ ],
+ "college-2": [
+  "8a7777c6e08a58a988d194ee507f840d7315e0274572fb1e20c64e2d3d5980f5"
+ ],
+ "college-3": [
+  "a2379b07077672044831d1de90245ad1ff9465cf31ccf45b169c292fcad35701"
+ ],
+ "college-4": [
+  "e7f16357034adc2caf547790398a23fc6e509e443513e4606d4e4457dc8ea0d8"
+ ],
+ "college-5": [
+  "f87309901a391d24145c50032e9936c8c193d017b7556ad09805b397198b4976"
+ ],
+ "hospital-1": [
+  "9835e563fa6362cfa13acf41a0ed3688f65ea194913eb57a894c7d361ab0ad11"
+ ],
+ "hospital-2": [
+  "69c2a918f07d09beb38dae01a112cbe84aeeeb572590e3aaf51ad313a9e5b00b"
+ ],
+ "hospital-3": [
+  "4ce05f0396b700a3b42713eed2a94f40ac8570ac17b76152efcf1e7bc943a4aa"
+ ],
+ "hospital-4": [
+  "1267b82aed91d1aba4e4dedf34aa292ff8e5ea6186346845a8dc5a3e67e5b9ec"
+ ],
+ "hospital-5": [
+  "3fe059baaec7922df0c5de139455d37eb454c6842eb3908a7bfec9ca98b8cbbf"
+ ],
+ "clinic-1": [
+  "62fbe527b0b25004b58c09a3ea1c3a7b6c305e114e81b250838d497c120b62b0"
+ ],
+ "clinic-2": [
+  "32b570475f6dda154228b74afd28ab901b394198969029549a5ecd51da98fd31"
+ ],
+ "clinic-3": [
+  "c21dffe0d35796d93be1cd23c5ddb3a5e8fc9c57b4164ff464e630daa7216c82"
+ ],
+ "clinic-4": [
+  "64fce87715a40f40f0fe1a8a1e27e6e79fc648717bd6f9fb68154bcdb9017e95"
+ ],
+ "clinic-5": [
+  "593e9db7dca1fde6c7e157a04f0067389a03db21fe4707e9ae2450392e812e92"
+ ],
+ "dental-clinic-1": [
+  "700238441cc995b4f957985a3d641a7359187c6337603edc7ed02ce5ffdfadb1"
+ ],
+ "dental-clinic-2": [
+  "14b6b1cd6290518b63f84df9e82f3020999235b0126915e99fe5b735a0bd6a0a"
+ ],
+ "dental-clinic-3": [
+  "df3e94d94000b29a317964bd46317c41ca4ebe94bfd62dfbf9b381fdc63e2b72"
+ ],
+ "dental-clinic-4": [
+  "edc7ff19daba745ea430a492881175ab92e9149849bfe61e97bf184642c7d012"
+ ],
+ "dental-clinic-5": [
+  "c505f5c8fd0fcb2022c9ace6c06178115e8c74171259d51d219f23bb0ebcc80b"
+ ],
+ "salon-1": [
+  "d96559ecbf11eabaf7c16f8900d699b5e045dfb7e29f34dc316127d9f3f1a5c9"
+ ],
+ "salon-2": [
+  "c618d308c57bf35abc16cf67be9c3818b8ab5bd5157a71af9b4214959fd2615b"
+ ],
+ "salon-3": [
+  "a322792f320cd38644282b0d7fe276b3f7b17c091b1c3e70e6fda679ce8c766a"
+ ],
+ "salon-4": [
+  "8699ff2c4cf6b2fe5bcc5e5d67f9d8a3e3f888263773243d11b7918405879bbd"
+ ],
+ "salon-5": [
+  "df5f9d006c64b025b3bde7633bbb9f84f8833fb9466ab5f39ed161a40392f0a5"
+ ],
+ "beauty-parlour-1": [
+  "87c0ba5f2657cff52dadd26724b7f6512c512ed067c49dc174584b0bbd9bb76b"
+ ],
+ "beauty-parlour-2": [
+  "e85abb242c2b9a60543fa8b1624ba2e4b27e04f7c9452f639a767747f29f6083"
+ ],
+ "beauty-parlour-3": [
+  "e1da171db3035050cdfef8c306c1df658ab8f8a3cebef1a2294e517cae967e6a"
+ ],
+ "beauty-parlour-4": [
+  "c5f29d9fb1826ca9c02cd70b49424f68400c40738f921dad17a8606a65826dfe"
+ ],
+ "beauty-parlour-5": [
+  "caa2ba06c090f3c431bf250a2357ed3e50de6d4326ab9ad97f1b681fc56d0af1"
+ ],
+ "restaurant-1": [
+  "f17bb6ff1530127eb86746dd8ab5bfffb34e8ffd5ea1bde5803befb9038e86e6"
+ ],
+ "restaurant-2": [
+  "9ddbbc8eb7c25ce9fb2aaed75badec21818c574af564cb481d93631a26750d05"
+ ],
+ "restaurant-3": [
+  "662572e7b6e49dad88697a37acd113dddd114f8d6b5716cf7938d465e1be613c"
+ ],
+ "restaurant-4": [
+  "b9f0847588362194ba162d8bc13b6dd1dd4c0fab527394a02c912193f0e4c556"
+ ],
+ "restaurant-5": [
+  "871cc8dd9976ca09801b826b3ff1681b24073d07ecb73e4a48aeaf92fa1440ca"
+ ],
+ "hotel-1": [
+  "3eccb2162ed794ef75f90ded05d3782478c8e1346b411d77d7e9f6021f0914ec"
+ ],
+ "hotel-2": [
+  "689cfc9c4139b4551acfabc16d11aa92f751f12c4764d409de82f672429fe765"
+ ],
+ "hotel-3": [
+  "f549b84781d95dc0fb5a4d261666e67aa3c7d169086c5f426205f949e10477dc"
+ ],
+ "hotel-4": [
+  "09a71d3526abdc99605f32585eb7649fba99a0b8948b1c8695128b0ad398f9ee"
+ ],
+ "hotel-5": [
+  "29d3feb7bb85ac901e231060cc15be4bbf1b883445549a843a405f914fd4bfcc"
+ ],
+ "real-estate-1": [
+  "17c8826b16618c454aff059eff164467c9d2de10dffa8de801f73f0af2544264"
+ ],
+ "real-estate-2": [
+  "abf8466d706195f3622ae41074d5ff7bc6af8df368c9039a8452c6730afc0c5e"
+ ],
+ "real-estate-3": [
+  "436dda228e1d5ac4c2a772f45b9993c8bdb1459e9ed1cc28282452a7ce8a198b"
+ ],
+ "real-estate-4": [
+  "f1a921f5c934d1a903629b6b045c1fcdc1ea31f433c9fbc8a12e35f91bbe08e6"
+ ],
+ "real-estate-5": [
+  "b948fb6803766307b5dd725ab1cd1f1437a808bd6cca0116f3bb62f7e94fa275"
+ ],
+ "e-commerce-1": [
+  "87213b2352ab012a90a70733c4926bc5995f297b7ad3c0941351ae66c61dc648"
+ ],
+ "e-commerce-2": [
+  "4f4178e9d7091d262205e380fc13feb866478cc0a4df98b94662b23c118438fa"
+ ],
+ "e-commerce-3": [
+  "afb4c00df3df11b370f2948913cd9b9a894f07240fdce54dacd5341b5eaf006b"
+ ],
+ "e-commerce-4": [
+  "52b7042c70c1182aa05338c1f13a29adedc5af09139fb0f5cf8f6a63b7134e7f"
+ ],
+ "e-commerce-5": [
+  "f613541ae49a2479378b20da21f9c86cfab9a65815a80052db56a404b2bf68ca"
+ ],
+ "follow-up-1": [
+  "ef263ffc06e6319e2c44d31f054093b1fc755fef20e66f55dd2874be16cd5d22"
+ ],
+ "follow-up-2": [
+  "f68420972a85cbba94f1f2287c2abb02264a998e34e2940f9d693422ece92bd7"
+ ],
+ "follow-up-3": [
+  "d2836003e051eeeb04df6c70c35c95b14ee588ab230bd11f421a724e8814010d"
+ ],
+ "follow-up-4": [
+  "1db0e5e8896c609424d3fa4a54421ca8536eb1569193b53cf35a210d6e11895b"
+ ],
+ "follow-up-5": [
+  "b200bd0cfa7f60bee932a4648e2b3714d46016e07156c7d1a86239a5afab1c72"
+ ],
+ "custom-1": [
+  "263fca920b90e7193679d63581cda6928f12078784b33757a38b07042125cf6b"
+ ],
+ "custom-2": [
+  "c98d33deee04bb35367b6df775cf9df165ac7983f2b70aece7f4916a85b4b5a3"
+ ],
+ "custom-3": [
+  "a27ede27e87c74ea3e1b67643d6ec64307e891ba24c83ad8b526580ca89196a3"
+ ],
+ "custom-4": [
+  "bc26fd4eeb9d300874faa90f88dc1ab5e35e6018e62bef9ab592884b0de304de"
+ ],
+ "custom-5": [
+  "c681d6cca6eb6c29ccfa479f56461cd04e30c235d7a7fb48cbc7c53579f45897"
+ ]
+}

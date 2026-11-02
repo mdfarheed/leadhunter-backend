@@ -3,7 +3,7 @@ const FALLBACKS = {
   businessName: 'Team',
   category: 'business',
   city: 'aapka shehar',
-  ownerName: 'Sir/Madam',
+  ownerName: 'Team',
   developerName: '[Your Name]',
 };
 

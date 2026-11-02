@@ -6,6 +6,7 @@ exports.errorHandler = (err, req, res, next) => { // eslint-disable-line no-unus
   let status = err.status || 500;
   let message = err.message || 'Server error';
   let details = err.details;
+  let code = err.code && typeof err.code === 'string' ? err.code : undefined;
 
   if (err.name === 'ValidationError' && err.errors) {
     status = 400;
@@ -15,6 +16,7 @@ exports.errorHandler = (err, req, res, next) => { // eslint-disable-line no-unus
     status = 400;
     message = `Invalid ${err.path}`;
   } else if (err.code === 11000) {
+    code = undefined;
     status = 409;
     message = `Duplicate value for ${Object.keys(err.keyPattern || {}).join(', ') || 'unique field'}`;
   } else if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
@@ -31,5 +33,5 @@ exports.errorHandler = (err, req, res, next) => { // eslint-disable-line no-unus
     console.error('[error]', err);
     if (env.nodeEnv === 'production') message = 'Internal server error';
   }
-  res.status(status).json({ message, ...(details ? { details } : {}) });
+  res.status(status).json({ message, ...(code ? { code } : {}), ...(details ? { details } : {}) });
 };

@@ -13,6 +13,7 @@ function normalizePhone(raw, defaultCc = '91') {
     if (digits.startsWith(defaultCc)) national = digits.slice(defaultCc.length);
     else {
       if (digits.length < 8 || digits.length > 15) return { valid: false, reason: 'International number must be 8-15 digits' };
+      if (digits.startsWith('0')) return { valid: false, reason: 'International numbers cannot start with 0' };
       return { valid: true, digits, cc: null, national: digits, isMobile: true, display: `+${digits}`, warning: null };
     }
   } else {
@@ -37,4 +38,15 @@ function normalizePhone(raw, defaultCc = '91') {
   return { valid: true, digits: `${cc}${national}`, cc, national, isMobile: true, display: `+${cc}${national}`, warning: null };
 }
 
-module.exports = { normalizePhone };
+// Strict check used before a lead may be SAVED. A phone number is mandatory: missing / null / blank / whitespace-only /
+// malformed values are all rejected. Valid numbers come back normalised (digits for wa.me + a display string to store).
+const PHONE_REQUIRED_MESSAGE = 'Phone number is required. A business without a phone number cannot be saved as a lead.';
+function checkPhone(raw, defaultCc = '91') {
+  const input = typeof raw === 'string' || typeof raw === 'number' ? String(raw).trim() : '';
+  if (!input) return { ok: false, code: 'PHONE_REQUIRED', message: PHONE_REQUIRED_MESSAGE };
+  const n = normalizePhone(input, defaultCc);
+  if (!n.valid) return { ok: false, code: 'PHONE_INVALID', message: `Invalid phone number: ${n.reason}.`, reason: n.reason };
+  return { ok: true, digits: n.digits, display: n.display, isMobile: n.isMobile, warning: n.warning || null };
+}
+
+module.exports = { normalizePhone, checkPhone, PHONE_REQUIRED_MESSAGE };

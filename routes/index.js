@@ -41,12 +41,15 @@ r.get('/leads', leads.list);
 r.get('/leads/meta', leads.meta);
 r.post('/leads', v.leadCreate, leads.create);
 r.post('/leads/bulk-update', v.leadBulk, leads.bulkUpdate);
+r.post('/leads/import', v.leadImport, leads.importMany);
 r.get('/leads/:id', v.idParam, leads.get);
 r.put('/leads/:id', v.leadUpdate, leads.update);
 r.delete('/leads/:id', v.idParam, leads.remove);
 r.patch('/leads/:id/status', v.leadStatus, leads.setStatus);
 
 r.get('/templates', tpl.list);
+r.get('/templates/next', v.rotationNext, tpl.next);
+r.post('/templates/rotation/used', v.rotationUsed, tpl.markUsed);
 r.post('/templates', v.templateCreate, tpl.create);
 r.put('/templates/:id', v.templateUpdate, tpl.update);
 r.delete('/templates/:id', v.idParam, tpl.remove);

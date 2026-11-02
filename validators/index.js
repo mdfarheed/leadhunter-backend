@@ -1,7 +1,9 @@
-const { body, param, validationResult } = require('express-validator');
+const { body, param, query, validationResult } = require('express-validator');
 const { PLACEHOLDERS, findUnsupported } = require('../utils/templateUtils');
 const { STATUSES } = require('../models/Lead');
 const { TEMPLATE_CATEGORIES } = require('../models/MessageTemplate');
+const { checkPhone } = require('../utils/phone');
+const { MAX_IMPORT } = require('../services/leadService');
 
 const validate = (req, res, next) => {
   const result = validationResult(req);
@@ -39,7 +41,21 @@ const leadFields = [
   body('nextFollowUpAt').optional({ nullable: true, checkFalsy: true }).isISO8601().withMessage('Invalid follow-up date'),
   body('lastContactedAt').optional({ nullable: true, checkFalsy: true }).isISO8601().withMessage('Invalid last contacted date'),
 ];
-exports.leadCreate = [body('businessName').isString().trim().notEmpty().withMessage('Business name is required'), ...leadFields, validate];
+// A phone number is mandatory to create a lead: missing / null / blank / whitespace-only / malformed values are rejected here
+// (and again in the service + model, so no route can skip it). The check is done in the controller too for the exact error code.
+const phoneRequired = body('phone').custom((value) => {
+  const r = checkPhone(value);
+  if (!r.ok) throw new Error(r.message);
+  return true;
+});
+exports.leadCreate = [body('businessName').isString().trim().notEmpty().withMessage('Business name is required'), phoneRequired, ...leadFields, validate];
+exports.leadImport = [
+  body('leads').isArray({ min: 1, max: MAX_IMPORT }).withMessage(`Send 1-${MAX_IMPORT} leads`),
+  body('leads.*').isObject().withMessage('Each lead must be an object'),
+  body('defaults').optional().isObject(),
+  body('force').optional().isBoolean(),
+  validate,
+];
 exports.leadUpdate = [mongoId(), ...leadFields, validate];
 exports.idParam = [mongoId(), validate];
 exports.leadStatus = [mongoId(), body('status').isIn(STATUSES).withMessage('Invalid status'), validate];
@@ -116,3 +132,6 @@ exports.settingsUpdate = [
   body('preferences.defaultTemplateId').optional({ nullable: true, checkFalsy: true }).isMongoId(),
   validate,
 ];
+
+exports.rotationNext = [query('category').isIn(TEMPLATE_CATEGORIES).withMessage('Invalid template category'), validate];
+exports.rotationUsed = [body('templateId').isMongoId().withMessage('Invalid template id'), validate];

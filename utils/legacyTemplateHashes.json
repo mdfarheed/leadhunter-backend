@@ -1,0 +1,157 @@
+[
+ {
+  "name": "Professional Website Introduction",
+  "category": "General Business",
+  "sha256": "9fd04a3f29a3fb50cd0e2654a4c3de3591a54f6092b6ce16fcc90f33ca2f1251"
+ },
+ {
+  "name": "Business Growth & Online Presence",
+  "category": "General Business",
+  "sha256": "11bd548938fcbe23c64761be5fc1295b85d4c47e572a8d5c40afc90c3cd6b6e7"
+ },
+ {
+  "name": "School Website & Online Admission",
+  "category": "School",
+  "sha256": "55850868d1c753f94cfcd5465b0bde10963cf79ac9d3b259d1b11a1e4f2569d1"
+ },
+ {
+  "name": "School Digital Presence",
+  "category": "School",
+  "sha256": "8b1f88afa8dccf84b83982b623e61844f9f1028d57f6c07bab72b2acc9d517e1"
+ },
+ {
+  "name": "College Website & Admission System",
+  "category": "College",
+  "sha256": "92c859b5e7c4190f05690d873e53463d8af51f8c448121cdc668aa49572138d0"
+ },
+ {
+  "name": "Hospital Website & Patient Enquiry",
+  "category": "Hospital",
+  "sha256": "15a0b208487ea97880f619e4c62eda9923a4f5d5858324c49c9e2fa67e7a17a6"
+ },
+ {
+  "name": "Clinic Website & Appointment Enquiry",
+  "category": "Clinic",
+  "sha256": "2187a42af40dae2e4f8f1dbfde146e0eacbc19f03248ba6de3c617e49e63f510"
+ },
+ {
+  "name": "Dental Clinic Website & Patient Enquiries",
+  "category": "Dental Clinic",
+  "sha256": "4be2f91b34e53674d7601eeb2b2494998119235c16f900d35275ca54825883b4"
+ },
+ {
+  "name": "Salon Website & Online Booking",
+  "category": "Salon",
+  "sha256": "f4be9019cd90a056d23e0a96ef40041c18f717f24f924a124553aab084afdbf1"
+ },
+ {
+  "name": "Beauty Parlour Website & Appointment System",
+  "category": "Beauty Parlour",
+  "sha256": "efe343cf3f45c87892cb57d022d4ff4758647b27f60f05ae84c534c494384722"
+ },
+ {
+  "name": "Restaurant Digital Menu & Website",
+  "category": "Restaurant",
+  "sha256": "710f552c5149b72c64e48fbfab0974a97442fc6ee5328ccfc298a9638916515a"
+ },
+ {
+  "name": "Hotel Website & Booking Enquiries",
+  "category": "Hotel",
+  "sha256": "8370393df5f96a5e47e00e17e56e9dfb44f8e8dfff543987b845572de6299d88"
+ },
+ {
+  "name": "Real Estate Website & Property Enquiries",
+  "category": "Real Estate",
+  "sha256": "a9d63103ec33fd27079449e1219e52d4f8a494b3ba58ab85da935619b4465c00"
+ },
+ {
+  "name": "Online Store & Product Catalogue",
+  "category": "E-commerce",
+  "sha256": "da23752876d1258c3bc04ebff9ff9cc2e7bf7d205ea0011c156a73c33aef5a3f"
+ },
+ {
+  "name": "Follow-up After Initial Introduction",
+  "category": "Follow-up",
+  "sha256": "82ab114a035aefb2e4feba52cfc0b186bdc5e09c5bcb9c8c0166dff361c76b97"
+ },
+ {
+  "name": "Follow-up With Demo Offer",
+  "category": "Follow-up",
+  "sha256": "edd39ce858e42893718b37ae8211fc5cea925919c03e0da44e8bef94e15a46cd"
+ },
+ {
+  "name": "Final Polite Follow-up",
+  "category": "Follow-up",
+  "sha256": "74f2c62d0d35858c5e141bac4dd665d0cac51ac346f5014ef7abd091f1b9ed71"
+ },
+ {
+  "name": "Custom Business Website Proposal",
+  "category": "Custom",
+  "sha256": "273ce0715b2ed2104625a088a3771f95ed51b8bb4bd095d4f9099df8f8c47502"
+ },
+ {
+  "name": "General Website Development Pitch",
+  "category": "General Business",
+  "sha256": "0481f2f142cab3af0ff612e03d1c2c0e786c03df3953ebfe6376dca26feb1923"
+ },
+ {
+  "name": "School Website & Admission Enquiry",
+  "category": "School",
+  "sha256": "684ab9cd17f2565f5f65d6bd7f25dc76532c7ffa8cd81efea1ca06fb5ddb0e1b"
+ },
+ {
+  "name": "College Website & Admissions",
+  "category": "College",
+  "sha256": "c20807e420c9cadaa046243287dbc0bcd6b023c534c492a771d8e30f33c05411"
+ },
+ {
+  "name": "Hospital Website & Appointment System",
+  "category": "Hospital",
+  "sha256": "f96d9ed1d82aed8be3b501ac9c7c9d9e2cc171a1efc60ac539158d3e1dad93ff"
+ },
+ {
+  "name": "Clinic Online Appointment Website",
+  "category": "Clinic",
+  "sha256": "a6bad3487b5df28df407c7567c63a1401c2a301c22305b68bc1613c07e28cb4e"
+ },
+ {
+  "name": "Dental Clinic Website",
+  "category": "Dental Clinic",
+  "sha256": "17f3e7795eb37591116965458476c7abda2195568998fb0bf1ed62cd276c65f8"
+ },
+ {
+  "name": "Salon Booking Website",
+  "category": "Salon",
+  "sha256": "aa4f1e8accdac8886a81eb324c58e2feb91c040bb5ba81f3af57aec9b7fb2020"
+ },
+ {
+  "name": "Beauty Parlour Website",
+  "category": "Beauty Parlour",
+  "sha256": "e3d61ee1dd1c5fd7e0e5146cad9dd6d6111398dff7a95a6f8a1708a75f872985"
+ },
+ {
+  "name": "Restaurant Menu & Order Website",
+  "category": "Restaurant",
+  "sha256": "cf0f4eeab8acc24d48a1401d24deb10eed92f75198877ff11f9b038c92b4f78c"
+ },
+ {
+  "name": "Hotel Booking Enquiry Website",
+  "category": "Hotel",
+  "sha256": "9b7fa9290bd58d9d32c762aeac0f5890dcdee4a8b73d9bea8236e4ad9f140118"
+ },
+ {
+  "name": "Real Estate Listings Website",
+  "category": "Real Estate",
+  "sha256": "05279075a9afe93996d8705e2229fdf7220f0bccfa08d5897a35bbce90cf80f1"
+ },
+ {
+  "name": "Online Store for Shops",
+  "category": "E-commerce",
+  "sha256": "5b7274e78503f872b42b23176c8bb269ab27c8870709923115c531dea30f9d44"
+ },
+ {
+  "name": "Polite Follow-up",
+  "category": "Follow-up",
+  "sha256": "a6c0a528060b5ea507bd6b205e68bb47e0ad0212642a1faf88a500d42728c86d"
+ }
+]

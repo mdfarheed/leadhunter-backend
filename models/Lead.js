@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+const { checkPhone } = require('../utils/phone');
 
-const STATUSES = ['New', 'Contacted', 'Interested', 'Follow-up', 'Converted', 'Not Interested', 'Do Not Contact'];
+const { STATUSES } = require('../utils/leadConstants');
 
 /*
  * Field provenance:
@@ -15,7 +16,9 @@ const leadSchema = new mongoose.Schema({
   phone: { type: String, trim: true, maxlength: 40, default: '' },
   phoneNormalized: { type: String, index: true, sparse: true },
   whatsappNumber: { type: String, trim: true, maxlength: 40, default: '' },
+  // Manual note by the admin ("does this number have WhatsApp?"). Not a contact state.
   whatsappStatus: { type: String, enum: ['unknown', 'available', 'unavailable'], default: 'unknown' },
+
   website: { type: String, trim: true, maxlength: 300, default: '' },
   city: { type: String, trim: true, maxlength: 100, default: '' },
   state: { type: String, trim: true, maxlength: 100, default: '' },
@@ -34,6 +37,18 @@ const leadSchema = new mongoose.Schema({
   cityKey: String,
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, { timestamps: true });
+
+// Phone is mandatory for every NEW lead and whenever the phone value is changed. Legacy records that never had one stay
+// readable/editable (so existing data is not broken) but can never be created again. This hook is the last line of defence:
+// it runs for any code path that saves a Lead, not just the HTTP controllers.
+leadSchema.pre('validate', function enforcePhone(next) {
+  if (this.isNew || this.isModified('phone')) {
+    const check = checkPhone(this.phone, this.$locals?.defaultCountryCode || '91');
+    if (!check.ok) this.invalidate('phone', check.message, this.phone);
+    else this.phoneNormalized = check.digits;
+  }
+  next();
+});
 
 leadSchema.index({ placeId: 1 }, { unique: true, partialFilterExpression: { placeId: { $type: 'string' } } });
 leadSchema.index({ category: 1 });

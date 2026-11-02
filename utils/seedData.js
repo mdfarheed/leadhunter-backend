@@ -1,67 +1,15 @@
-// // Default business categories and WhatsApp templates (Hinglish). Edit freely in the UI after seeding.
-// const CATEGORIES = [
-//   ['Hospitals', 'hospitals', ['hospital'], 'Hospital'],
-//   ['Clinics', 'clinics', ['doctor'], 'Clinic'],
-//   ['Dental Clinics', 'dental clinics', ['dentist'], 'Dental Clinic'],
-//   ['Schools', 'schools', ['school'], 'School'],
-//   ['Colleges', 'colleges', ['university'], 'College'],
-//   ['Coaching Institutes', 'coaching institutes', [], 'School'],
-//   ['Beauty Parlours', 'beauty parlours', ['beauty_salon'], 'Beauty Parlour'],
-//   ['Salons', 'salons', ['hair_salon'], 'Salon'],
-//   ['Restaurants', 'restaurants', ['restaurant'], 'Restaurant'],
-//   ['Cafes', 'cafes', ['cafe'], 'Restaurant'],
-//   ['Hotels', 'hotels', ['lodging'], 'Hotel'],
-//   ['Marriage Gardens', 'marriage gardens', [], 'Hotel'],
-//   ['Real Estate Dealers', 'real estate dealers', ['real_estate_agency'], 'Real Estate'],
-//   ['Jewellery Shops', 'jewellery shops', ['jewelry_store'], 'E-commerce'],
-//   ['Furniture Shops', 'furniture shops', ['furniture_store'], 'E-commerce'],
-//   ['Gyms', 'gyms', ['gym'], 'General Business'],
-//   ['Automobile Dealers', 'automobile dealers', ['car_dealer'], 'General Business'],
-//   ['Medical Stores', 'medical stores', ['pharmacy'], 'Clinic'],
-//   ['Travel Agencies', 'travel agencies', ['travel_agency'], 'General Business'],
-//   ['Interior Designers', 'interior designers', [], 'General Business'],
-//   ['Architects', 'architects', [], 'General Business'],
-//   ['Photographers', 'photographers', [], 'General Business'],
-//   ['Event Planners', 'event planners', [], 'General Business'],
-// ].map(([name, searchTerm, googleTypes, templateCategory]) => ({ name, searchTerm, googleTypes, templateCategory }));
-
-// const SIGN = '\n\nDhanyavaad,\n{{developerName}}\nFull Stack Web Developer';
-// const T = (name, category, body) => ({ name, category, body: body + SIGN, isDefault: true });
-
-// const TEMPLATES = [
-//   T('General Website Development Pitch', 'General Business',
-//     'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon, ek Full Stack Web Developer.\n\nMain businesses ke liye professional, modern aur mobile-friendly websites develop karta hoon.\n\nMaine aapke business ke baare mein dekha. Agar aap apne business ko online grow karna chahte hain, toh main aapke liye ek professional website aur WhatsApp enquiry system develop kar sakta hoon.\n\nKya main aapko ek demo design dikha sakta hoon?'),
-//   T('School Website & Admission Enquiry', 'School',
-//     'Namaste {{businessName}} ke Principal/Management ji,\n\nMain {{developerName}} hoon. Main schools ke liye website banata hoon jisme admission enquiry form, notices, gallery aur parents ke liye WhatsApp contact hota hai.\n\n{{city}} mein kai parents ab school online dekhkar decide karte hain. Kya main aapko ek demo dikha sakta hoon?'),
-//   T('College Website & Admissions', 'College',
-//     'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Colleges ke liye main modern website banata hoon jisme courses, fees, admission form aur student enquiry system hota hai.\n\nKya main aapko ek chhota demo dikha sakta hoon?'),
-//   T('Hospital Website & Appointment System', 'Hospital',
-//     'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Main hospitals ke liye professional website banata hoon jisme doctors ki list, departments, emergency contact aur online appointment request hoti hai.\n\nKya main aapko ek demo dikha sakta hoon?'),
-//   T('Clinic Online Appointment Website', 'Clinic',
-//     'Namaste {{ownerName}} ji,\n\nMain {{developerName}} hoon. {{businessName}} ke liye main ek simple website bana sakta hoon jisme patients online appointment ke liye WhatsApp par seedha message kar sakein.\n\nKya main aapko demo dikha sakta hoon?'),
-//   T('Dental Clinic Website', 'Dental Clinic',
-//     'Namaste {{ownerName}} ji,\n\nMain {{developerName}} hoon. Dental clinics ke liye main website banata hoon jisme treatments, before/after gallery, patient reviews aur appointment booking hoti hai.\n\n{{businessName}} ke liye ek demo design dikhaun?'),
-//   T('Salon Booking Website', 'Salon',
-//     'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Salons ke liye main website banata hoon jisme services, price list, gallery aur WhatsApp booking button hota hai.\n\nKya main aapko demo dikha sakta hoon?'),
-//   T('Beauty Parlour Website', 'Beauty Parlour',
-//     'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Beauty parlour ke liye main ek khoobsurat mobile-friendly website banata hoon jisme packages, gallery aur WhatsApp appointment hoti hai.\n\nKya main ek demo bhej sakta hoon?'),
-//   T('Restaurant Menu & Order Website', 'Restaurant',
-//     'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Restaurants/cafes ke liye main website banata hoon jisme digital menu, photos, location aur WhatsApp par order/table booking hoti hai.\n\nKya main aapko demo dikha sakta hoon?'),
-//   T('Hotel Booking Enquiry Website', 'Hotel',
-//     'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Hotels aur marriage gardens ke liye main website banata hoon jisme rooms/halls ki photos, rates aur booking enquiry WhatsApp par seedha aati hai.\n\nKya main aapko ek demo dikha sakta hoon?'),
-//   T('Real Estate Listings Website', 'Real Estate',
-//     'Namaste {{ownerName}} ji,\n\nMain {{developerName}} hoon. Real estate dealers ke liye main property listing website banata hoon jisme photos, location aur buyer enquiry WhatsApp par aati hai.\n\n{{businessName}} ke liye demo dikhaun?'),
-//   T('Online Store for Shops', 'E-commerce',
-//     'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Main shops ke liye online catalogue/e-commerce website banata hoon taaki {{city}} ke bahar bhi customers aapka saman dekh aur order kar sakein.\n\nKya main aapko ek demo dikha sakta hoon?'),
-//   T('Polite Follow-up', 'Follow-up',
-//     'Namaste {{businessName}} ji,\n\nMain {{developerName}} hoon. Pichhli baar maine website ke baare mein baat ki thi. Bas yeh poochna tha ki kya aapko demo dekhne ka time mila?\n\nAgar abhi zaroorat nahi hai toh koi baat nahi, bataiye aur main dobara message nahi karunga.'),
-// ];
-
-// module.exports = { CATEGORIES, TEMPLATES };
-
-
-
-// Default business categories and professional WhatsApp templates.
+// Default business categories and professional WhatsApp templates (natural Hinglish).
+//
+// Rules every template follows (enforced by tests/templates.test.js):
+//   - exactly FIVE starter templates for each of the 14 message categories
+//   - greeting is always "Namaste {{businessName}}," - no "Sir / Madam / Principal / Manager / Owner / Ji"
+//   - only supported placeholders ({{businessName}}, {{category}}, {{city}}, {{developerName}})
+//   - no guaranteed-results, income or "get more customers" promises; nothing misleading
+//   - medical categories avoid testimonials / before-after / results claims (professional advertising rules differ)
+//   - every message introduces the sender ("Main Etah se hoon, mera naam Farheed hai"), ends with a YES / STOP line, then the signature
+//
+// These are meant to be CHOSEN by the admin for relevance (and edited before opening WhatsApp). They are never rotated or
+// randomised automatically, and nothing here sends a message.
 
 const CATEGORIES = [
   ['Hospitals', 'hospitals', ['hospital'], 'Hospital'],
@@ -94,380 +42,599 @@ const CATEGORIES = [
   templateCategory,
 }));
 
-const SIGNATURE = `
+// Every message ends with a clear question (reply YES if interested) and an easy opt-out (type STOP).
+const CLOSING = `Agar aap interested hain, to "YES" bol dijiye. Agar aapko is tarah ke messages nahi chahiye, to "STOP" type kar dijiye.`;
 
-Regards,
-{{developerName}}
-Web Development & Digital Solutions`;
+const SIGNATURE = `\n\nRegards,\nFarheed\nWeb Development & Digital Solutions`;
 
-const T = (name, category, body, isDefault = false) => ({
-  name,
-  category,
-  body: body + SIGNATURE,
-  isActive: true,
-  isDefault,
-});
+const slug = (c) => c.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+const counters = {};
+// T(category, name, body): seedKey is stable ("school-3") so re-running the seed never duplicates and customisations are never overwritten.
+const T = (category, name, body) => {
+  counters[category] = (counters[category] || 0) + 1;
+  return {
+    seedKey: `${slug(category)}-${counters[category]}`,
+    name,
+    category,
+    body: `${body.trim()}\n\n${CLOSING}${SIGNATURE}`,
+    isActive: true,
+    isDefault: counters[category] === 1, // template #1 of each category is its default; the admin can change this in the UI
+  };
+};
 
 const TEMPLATES = [
 
-  // GENERAL BUSINESS
-
-  T(
-    'Professional Website Introduction',
-    'General Business',
+  // ---------- GENERAL BUSINESS ----------
+  T('General Business', 'Website Introduction',
     `Namaste {{businessName}},
 
-Aaj customers kisi business ke products aur services ke baare mein jaanne ke liye online search karte hain.
+Main Etah se hoon, mera naam Farheed hai. Main website development aur digital solutions par kaam karta hoon.
 
-Main businesses ke liye professional websites develop karta hoon, jahan customers aapki services, photos, contact details aur enquiries easily access kar sakte hain.
+{{city}} mein bahut se log kisi bhi business ko pehle online search karke dekhte hain. Ek simple, mobile-friendly website par aapki services, contact details aur location ek hi jagah mil sakti hain.
 
-Aapke business ke liye ek suitable website concept share karna chahta hoon.
-
-Kya main aapko ek short demo share kar sakta hoon?`,
-    true
-  ),
-
-  T(
-    'Business Growth & Online Presence',
-    'General Business',
+Agar aap chahein, to {{businessName}} ke liye ek sample design share kar sakta hoon.`),
+  T('General Business', 'WhatsApp Enquiry Button',
     `Namaste {{businessName}},
 
-Aapke business ki online presence ko aur professional banane ke liye ek idea share karna chahta hoon.
+Main Etah se hoon, mera naam Farheed hai. Main aise websites banata hoon jahan visitor ek click mein aapko WhatsApp par enquiry bhej sake.
 
-Ek well-designed website se customers aapki services, business details aur contact information ek hi jagah dekh sakte hain.
+Isse aapke customers ko baar-baar number dhundhna nahi padta, aur aapki services ki details bhi ek jagah dikh jaati hain.
 
-Ismein WhatsApp enquiry, service pages aur Google-friendly structure bhi include kiya ja sakta hai.
-
-Kya aap is tarah ki website ka demo dekhna pasand karenge?`
-  ),
-
-  // SCHOOL
-
-  T(
-    'School Website & Online Admission',
-    'School',
+Kya main aapko ek chhota sa sample dikha sakta hoon?`),
+  T('General Business', 'Services & Contact Page',
     `Namaste {{businessName}},
 
-Parents school select karne se pehle aksar online school details, facilities, activities aur admission information dekhna chahte hain.
+Main Etah se hoon, mera naam Farheed hai. Main {{businessName}} ke baare mein online dekh raha tha.
 
-Main schools ke liye professional websites develop karta hoon, jisme:
+Ek apni website par aap services, timings, photos aur contact details apne tareeke se present kar sakte hain, aur customers ko sab ek jagah mil jata hai.
 
-• Online admission enquiry
-• Classes aur facilities ki information
-• School gallery aur achievements
-• Notices aur announcements
-• WhatsApp enquiry integration
-
-Aapke school ke liye ek dedicated website concept share kar sakta hoon.
-
-Kya aap iska demo dekhna chahenge?`,
-    true
-  ),
-
-  T(
-    'School Digital Presence',
-    'School',
+Agar aapko is par kaam karna interesting lage, to main kuch design ideas share kar sakta hoon.`),
+  T('General Business', 'Portfolio & Photo Showcase',
     `Namaste {{businessName}},
 
-School ki important information parents tak easily pahunchane ke liye ek professional website kaafi useful ho sakti hai.
+Main Etah se hoon, mera naam Farheed hai. Agar aapke paas apne kaam ki photos ya projects hain, to ek website par unhe achhe se organise karke dikhaya ja sakta hai.
 
-Ismein admission details, fee information, school activities, photo gallery aur enquiry forms ek hi platform par available ho sakte hain.
+Visitor ek hi jagah aapke kaam, services aur contact options dekh sakta hai.
 
-Saath hi future mein notices aur online admission management bhi add kiya ja sakta hai.
-
-Kya main aapko iska ek sample design share karun?`
-  ),
-
-  // COLLEGE
-
-  T(
-    'College Website & Admission System',
-    'College',
+Chahein to main {{businessName}} ke liye ek sample layout share kar dun?`),
+  T('General Business', 'Requirement Discussion',
     `Namaste {{businessName}},
 
-Students aur parents ko courses, eligibility, fees aur admission process ki information easily milna important hai.
+Main Etah se hoon, mera naam Farheed hai. Main website aur digital tools banane ka kaam karta hoon.
 
-Main colleges ke liye professional websites develop karta hoon, jisme:
+Abhi koi pitch nahi, bas yeh jaanna chahta hoon ki {{businessName}} ke liye online side par kya useful ho sakta hai: website, enquiry form, ya kuch aur.
 
-• Course aur department pages
-• Online admission enquiry
-• Application forms
-• Faculty aur campus information
-• Notices and announcements
-• Student enquiry management
+Agar aapke paas 5 minute hon, to apni requirement share kar dijiye, main uske hisaab se suggestion de dunga.`),
 
-Aapke institution ke liye ek suitable website demo prepare kar sakta hoon.
-
-Kya aap ise dekhna chahenge?`,
-    true
-  ),
-
-  // HOSPITAL
-
-  T(
-    'Hospital Website & Patient Enquiry',
-    'Hospital',
+  // ---------- SCHOOL ----------
+  T('School', 'Website & Admission Enquiry',
     `Namaste {{businessName}},
 
-Patients ko hospital ki facilities, departments, available services aur contact information easily milna bahut important hai.
+Main Etah se hoon, mera naam Farheed hai. Main schools ke liye website banata hoon jisme admission enquiry form, classes ki jaankari aur contact details ek jagah milte hain.
 
-Main hospitals ke liye professional websites develop karta hoon, jisme:
+Parents aksar admission se pehle online school ke baare mein dekhte hain, isliye ye jaankari clear aur updated honi chahiye.
 
-• Departments aur services
-• Doctor profiles
-• Appointment enquiry
-• Hospital facilities aur gallery
-• Location and contact details
-• Emergency contact information
-
-Aapke hospital ke liye ek professional website concept share karna chahta hoon.
-
-Kya main iska demo bhej sakta hoon?`,
-    true
-  ),
-
-  // CLINIC
-
-  T(
-    'Clinic Website & Appointment Enquiry',
-    'Clinic',
+Kya main {{businessName}} ke liye ek sample design share kar sakta hoon?`),
+  T('School', 'Parents Information Hub',
     `Namaste {{businessName}},
 
-Patients ko clinic ki services, timings, location aur appointment process ki information online milna convenient hota hai.
+Main Etah se hoon, mera naam Farheed hai. School website par notices, fee structure, timetable aur holiday list jaisi baatein ek jagah rakhi ja sakti hain, taaki parents ko baar-baar call na karna pade.
 
-Main clinics ke liye mobile-friendly websites develop karta hoon, jisme:
+Content aap khud bhi update kar sakein, aisa simple system banaya ja sakta hai.
 
-• Services and treatment details
-• Clinic timings and location
-• Appointment enquiry
-• WhatsApp contact
-• Patient information pages
-
-Aapke clinic ke liye ek simple aur professional website demo share kar sakta hoon.
-
-Kya aap dekhna chahenge?`,
-    true
-  ),
-
-  // DENTAL CLINIC
-
-  T(
-    'Dental Clinic Website & Patient Enquiries',
-    'Dental Clinic',
+Agar aap chahein, to main iska ek demo dikha sakta hoon.`),
+  T('School', 'Gallery, Events & Achievements',
     `Namaste {{businessName}},
 
-Dental clinic ki treatments, facilities aur appointment information ko professionally present karne ke liye website useful ho sakti hai.
+Main Etah se hoon, mera naam Farheed hai. Annual day, sports day aur competitions ki photos ko ek sundar gallery mein dikhane ke liye school website ek achha tareeka hai.
 
-Main dental clinics ke liye websites develop karta hoon, jisme:
+Isse parents aur naye students school ki activities ek nazar mein dekh sakte hain.
 
-• Dental treatments and services
-• Clinic introduction
-• Treatment gallery
-• Appointment enquiry
-• WhatsApp contact integration
-• Location and timings
-
-Aapke clinic ke liye ek relevant website design concept share karna chahta hoon.
-
-Kya main demo bhejun?`,
-    true
-  ),
-
-  // SALON
-
-  T(
-    'Salon Website & Online Booking',
-    'Salon',
+Kya main {{businessName}} ke liye ek sample gallery layout bhej dun?`),
+  T('School', 'Mobile-Friendly School Website',
     `Namaste {{businessName}},
 
-Customers ko salon ki services, pricing, photos aur booking options ek hi jagah milna unke experience ko convenient bana sakta hai.
+Main Etah se hoon, mera naam Farheed hai. Zyada tar parents school ki jaankari mobile par dekhte hain, isliye website ka phone par saaf aur tez chalna zaroori hai.
 
-Main salons ke liye modern websites develop karta hoon, jisme:
+Main {{city}} ke schools ke liye aisi hi mobile-friendly websites banata hoon, jisme admission form aur contact button easily mil jaye.
 
-• Services and pricing
-• Photo gallery
-• Online appointment enquiry
-• WhatsApp booking
-• Location and contact details
-
-Aapke salon ke liye ek attractive website concept share kar sakta hoon.
-
-Kya aap iska demo dekhna chahenge?`,
-    true
-  ),
-
-  // BEAUTY PARLOUR
-
-  T(
-    'Beauty Parlour Website & Appointment System',
-    'Beauty Parlour',
+Agar aap chahein, to ek demo link share kar sakta hoon.`),
+  T('School', 'Short Demo Request',
     `Namaste {{businessName}},
 
-Beauty services aur packages ko professionally showcase karne ke liye ek modern website useful ho sakti hai.
+Main Etah se hoon, mera naam Farheed hai. Main schools ke liye website aur admission enquiry system banata hoon.
 
-Ismein services, packages, photos, customer enquiries aur WhatsApp appointment facility include ki ja sakti hai.
+Agar aap permission dein, to main 10 minute mein ek demo dikha sakta hoon: call par ya aapke time ke hisaab se.
 
-Isse interested customers ko aapki services samajhne aur appointment enquiry karne mein aasani hogi.
+Aapko kaunsa time theek rahega?`),
 
-Kya aap apne parlour ke liye ek website demo dekhna chahenge?`,
-    true
-  ),
-
-  // RESTAURANT
-
-  T(
-    'Restaurant Digital Menu & Website',
-    'Restaurant',
+  // ---------- COLLEGE ----------
+  T('College', 'Courses & Admission Website',
     `Namaste {{businessName}},
 
-Customers restaurant visit karne se pehle menu, food photos, location aur contact details dekhna pasand karte hain.
+Main Etah se hoon, mera naam Farheed hai. Students aur parents ko courses, eligibility, fees aur admission process ek jagah clearly dikhna zaroori hai.
 
-Main restaurants ke liye professional websites develop karta hoon, jisme:
+Main colleges ke liye website banata hoon jisme course pages, admission enquiry form aur contact details hote hain.
 
-• Digital food menu
-• Food and restaurant gallery
-• Table booking enquiry
-• WhatsApp ordering enquiry
-• Location and contact details
-
-Aapke restaurant ke liye ek digital menu aur website demo share kar sakta hoon.
-
-Kya aap dekhna chahenge?`,
-    true
-  ),
-
-  // HOTEL
-
-  T(
-    'Hotel Website & Booking Enquiries',
-    'Hotel',
+Kya main {{businessName}} ke liye ek sample structure share kar sakta hoon?`),
+  T('College', 'Student Enquiry & Counselling Form',
     `Namaste {{businessName}},
 
-Travel karne wale customers hotel ki rooms, facilities, photos, location aur booking details online check karte hain.
+Main Etah se hoon, mera naam Farheed hai. College website par ek simple enquiry form lagaya ja sakta hai jisse interested students apna course aur contact detail bhej saken.
 
-Main hotels ke liye professional websites develop karta hoon, jisme:
+Aap un enquiries ko ek jagah dekh kar apne hisaab se follow up kar sakte hain.
 
-• Room and facility details
-• Photo gallery
-• Booking enquiry forms
-• WhatsApp contact
-• Location and directions
-• Offers and packages
-
-Aapke hotel ke liye ek suitable website demo share karna chahta hoon.
-
-Kya aap ise dekhna chahenge?`,
-    true
-  ),
-
-  // REAL ESTATE
-
-  T(
-    'Real Estate Website & Property Enquiries',
-    'Real Estate',
+Agar aap chahein, to main iska demo dikha sakta hoon.`),
+  T('College', 'Campus, Events & Notices',
     `Namaste {{businessName}},
 
-Property search karne wale customers ko available properties, photos, locations aur pricing information easily milna important hai.
+Main Etah se hoon, mera naam Farheed hai. Campus ki photos, events, seminar aur notices ko ek organised website par rakhna students ke liye kaafi convenient hota hai.
 
-Main real estate businesses ke liye property listing websites develop karta hoon, jisme:
+Main aisa layout bana sakta hoon jahan aap khud notices update kar saken.
 
-• Property listings
-• Property photos and details
-• Location and pricing
-• Buyer enquiry forms
-• WhatsApp enquiry integration
-• Search and filter options
-
-Aapke business ke liye ek property website concept share kar sakta hoon.
-
-Kya main iska demo bhejun?`,
-    true
-  ),
-
-  // E-COMMERCE
-
-  T(
-    'Online Store & Product Catalogue',
-    'E-commerce',
+Kya main {{businessName}} ke liye ek sample design bhej dun?`),
+  T('College', 'Department & Faculty Pages',
     `Namaste {{businessName}},
 
-Aapke products ko online showcase karne aur customers se enquiries ya orders receive karne ke liye ek professional website useful ho sakti hai.
+Main Etah se hoon, mera naam Farheed hai. Har department ke liye alag page, faculty ki jaankari aur syllabus ya downloads ka section website par banaya ja sakta hai.
 
-Main businesses ke liye online catalogue aur e-commerce websites develop karta hoon, jisme:
+Isse students ko zaroori jaankari dhundhne mein aasani hoti hai.
 
-• Product catalogue
-• Product images and details
-• Online enquiry or ordering
-• Shopping cart and checkout
-• Payment integration
-• Order management
-
-Aapke business ke liye ek suitable online store demo share kar sakta hoon.
-
-Kya aap dekhna chahenge?`,
-    true
-  ),
-
-  // FOLLOW-UP
-
-  T(
-    'Follow-up After Initial Introduction',
-    'Follow-up',
+Agar aap chahein, to main ek sample department page dikha sakta hoon.`),
+  T('College', 'Short Demo Request',
     `Namaste {{businessName}},
 
-Main apne previous message ke regarding ek short follow-up kar raha hoon.
+Main Etah se hoon, mera naam Farheed hai. Main colleges ke liye website aur admission enquiry system banata hoon.
 
-Maine aapke business ke liye professional website ka idea share kiya tha, jisse customers aapki services aur contact details easily access kar saken.
+Agar aap permission dein, to main ek chhota demo dikhana chahunga. Koi commitment nahi hai.
 
-Agar ye aapke liye relevant hai, toh main ek short demo share kar sakta hoon.
+Aapke liye kaunsa time suitable rahega?`),
 
-Kya aap interested hain?`,
-    true
-  ),
-
-  T(
-    'Follow-up With Demo Offer',
-    'Follow-up',
+  // ---------- HOSPITAL ----------
+  T('Hospital', 'Patient Information Website',
     `Namaste {{businessName}},
 
-Aapko disturb karne ke liye maafi chahta hoon. Main bas apne previous website proposal ke regarding follow-up kar raha hoon.
+Main Etah se hoon, mera naam Farheed hai. Patients aur unke parivaar ko hospital ki departments, facilities, timings aur contact details clearly milni chahiye.
 
-Agar aap chahein toh main aapke business type ke according ek sample website design share kar sakta hoon.
+Main hospitals ke liye aisi website banata hoon jahan ye sab jaankari ek jagah, aasan bhasha mein dikhai jaye.
 
-Isse aapko idea mil jayega ki aapke business ki online presence kaisi ho sakti hai.
-
-Kya demo share karna convenient rahega?`
-  ),
-
-  T(
-    'Final Polite Follow-up',
-    'Follow-up',
+Kya main {{businessName}} ke liye ek sample design share kar sakta hoon?`),
+  T('Hospital', 'Doctors & Departments Pages',
     `Namaste {{businessName}},
 
-Website development ke regarding mera ye final follow-up hai.
+Main Etah se hoon, mera naam Farheed hai. Website par har department aur doctor ka alag page ban sakta hai, jisme qualification, specialisation aur OPD timing diya ja sake.
 
-Agar filhaal aapki website ki requirement nahi hai, toh bilkul koi problem nahi.
+Content aapke professional guidelines ke hisaab se hi rakha jayega.
 
-Future mein kabhi website, online enquiry system ya business automation ki requirement ho, toh aap mujhse contact kar sakte hain.
-
-Thank you for your time.`
-  ),
-
-  // CUSTOM
-
-  T(
-    'Custom Business Website Proposal',
-    'Custom',
+Agar aap chahein, to main ek sample page dikha sakta hoon.`),
+  T('Hospital', 'Appointment Request Form',
     `Namaste {{businessName}},
 
-Main aapke business ke liye ek customized digital solution develop karne ke regarding contact kar raha hoon.
+Main Etah se hoon, mera naam Farheed hai. Ek simple appointment request form lagaya ja sakta hai jisse patient apni preferred date aur department bata sake, aur aapki team confirm karke wapas contact kare.
 
-Requirement ke according website, online enquiry system, booking platform, customer management ya custom software develop kiya ja sakta hai.
+Isse front desk par phone ka load kam ho sakta hai.
 
-Mera focus aise solutions par hota hai jo business ke actual workflow aur customer requirements ke according design kiye jaayen.
+Kya main iska demo dikha sakta hoon?`),
+  T('Hospital', 'Emergency Contact & Location',
+    `Namaste {{businessName}},
 
-Kya aap apni current digital requirements share karna chahenge?`
-  ),
+Main Etah se hoon, mera naam Farheed hai. Emergency number, ambulance contact aur Google Maps location ko website par aisi jagah rakha ja sakta hai jahan wo turant dikh jaye.
+
+Ye chhoti si baat zaroorat ke samay kaafi kaam aa sakti hai.
+
+Agar aap chahein, to main {{businessName}} ke liye ek sample layout bhej sakta hoon.`),
+  T('Hospital', 'Health Awareness & Notices',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Website par health camps, notices aur general awareness ka ek section bhi banaya ja sakta hai, jise aap khud update kar saken.
+
+Isse patients ko hospital ki activities ke baare mein jaankari milti rehti hai.
+
+Kya main iska ek short demo share kar dun?`),
+
+  // ---------- CLINIC ----------
+  T('Clinic', 'Clinic Website with Timings',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Patients ko clinic ki timings, location aur services ek jagah dikhna convenient hota hai.
+
+Main clinics ke liye simple, mobile-friendly website banata hoon jisme ye sab details aur contact button hote hain.
+
+Kya main {{businessName}} ke liye ek sample design share kar sakta hoon?`),
+  T('Clinic', 'Appointment Request Form',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Website par ek appointment request form lagaya ja sakta hai jisme patient apna naam, number aur preferred time bhej sake.
+
+Aap apni suvidha se un requests ko dekh kar confirm kar sakte hain.
+
+Agar aap chahein, to main iska demo dikha sakta hoon.`),
+  T('Clinic', 'Doctor Profile & Services',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Doctor ka introduction, qualification aur clinic ki services ko ek professional page par dikhaya ja sakta hai.
+
+Content aapke professional guidelines ke hisaab se rakha jata hai.
+
+Kya main ek sample profile page share kar dun?`),
+  T('Clinic', 'Location, Directions & Contact',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Naye patients ko clinic dhundhne mein aksar dikkat hoti hai. Website par map, landmark aur directions clearly diye ja sakte hain.
+
+Saath mein click-to-call aur WhatsApp enquiry button bhi lag sakta hai.
+
+Agar aap chahein, to main {{businessName}} ke liye ek chhota demo bana kar dikha sakta hoon.`),
+  T('Clinic', 'Short Demo Request',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Main clinics ke liye website aur appointment request system banata hoon.
+
+Agar aap permission dein, to main ek 10 minute ka demo dikhana chahunga. Koi pressure nahi hai.
+
+Aapko kaunsa time theek rahega?`),
+
+  // ---------- DENTAL CLINIC ----------
+  T('Dental Clinic', 'Treatments Information Website',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Dental clinics ke liye main website banata hoon jahan treatments, clinic timings aur contact details saaf tareeke se likhe hote hain.
+
+Patients ko process samajhne mein aasani hoti hai aur wo clinic tak pahunchne se pehle zaroori jaankari dekh lete hain.
+
+Kya main {{businessName}} ke liye ek sample design share kar sakta hoon?`),
+  T('Dental Clinic', 'Appointment Enquiry Form',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Website par ek simple appointment enquiry form lagaya ja sakta hai jisme patient apna concern aur preferred time bata sake.
+
+Aap suvidha se unhe confirm kar sakte hain, aur phone par bar-bar poochne ki zaroorat kam ho sakti hai.
+
+Agar aap chahein, to main iska demo dikha sakta hoon.`),
+  T('Dental Clinic', 'Clinic Gallery & Facilities',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Clinic ki reception, equipment aur team ki photos ek gallery mein dikhane se naye patients ko clinic ka environment pehle se samajh aa jata hai.
+
+Sab content aapke professional advertising guidelines ke andar hi rakha jata hai.
+
+Kya main ek sample gallery layout bhej dun?`),
+  T('Dental Clinic', 'Dental Care Tips Section',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Website par ek chhota section ban sakta hai jahan brushing, checkup schedule jaisi general dental care tips aap khud likh kar daal saken.
+
+Isse patients ko useful jaankari milti hai aur clinic ki website active rehti hai.
+
+Agar aap chahein, to main ek demo share kar sakta hoon.`),
+  T('Dental Clinic', 'Short Demo Request',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Main dental clinics ke liye website aur appointment enquiry system banata hoon.
+
+Agar aap permission dein, to main ek chhota demo dikhana chahunga. Koi commitment nahi hai.
+
+Aapke liye kaunsa time suitable rahega?`),
+
+  // ---------- SALON ----------
+  T('Salon', 'Services & Price List Website',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Customers aksar salon jaane se pehle services aur rates dekhna chahte hain.
+
+Main salons ke liye website banata hoon jisme services, price list, timings aur location ek jagah hoti hain.
+
+Kya main {{businessName}} ke liye ek sample design share kar sakta hoon?`),
+  T('Salon', 'Booking Enquiry via WhatsApp',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Website par ek "Book on WhatsApp" button lagaya ja sakta hai jisse customer service chun kar seedha aapko message bhej sake.
+
+Isse appointment ki baat-cheet aasan ho jati hai.
+
+Agar aap chahein, to main iska demo dikha sakta hoon.`),
+  T('Salon', 'Photo Gallery & Styles',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Salon ke haircut, styling aur interior ki photos ek achhi gallery mein dikhane se customers ko aapka kaam samajhne mein madad milti hai.
+
+Main aisi gallery banata hoon jo mobile par bhi tez chale.
+
+Kya main ek sample layout bhej dun?`),
+  T('Salon', 'Packages & Membership Page',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Agar aap packages ya membership offer karte hain, to unhe website par clearly present kiya ja sakta hai, taaki customers ko samajhne mein aasani ho.
+
+Offers aap khud kabhi bhi update kar sakein, aisa setup ban sakta hai.
+
+Agar aap chahein, to main {{businessName}} ke liye ek sample dikha sakta hoon.`),
+  T('Salon', 'Short Demo Request',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Main salons ke liye website aur booking enquiry system banata hoon.
+
+Agar aap permission dein, to main ek 10 minute ka demo dikhana chahunga. Koi pressure nahi hai.
+
+Aapko kaunsa time theek rahega?`),
+
+  // ---------- BEAUTY PARLOUR ----------
+  T('Beauty Parlour', 'Packages & Services Website',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Beauty parlour ke liye ek website banayi ja sakti hai jisme facial, hair, makeup jaise services aur packages saaf tareeke se dikhaye jayein.
+
+Customers ghar baithe sab jaankari dekh sakti hain aur apni pasand ka package samajh sakti hain.
+
+Kya main {{businessName}} ke liye ek sample design share kar sakta hoon?`),
+  T('Beauty Parlour', 'Bridal Packages Showcase',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Agar aap bridal ya party makeup ke packages dete hain, to unhe ek alag page par photos ke saath dikhaya ja sakta hai.
+
+Customer wahin se aapko enquiry bhi bhej sakti hai.
+
+Agar aap chahein, to main ek sample page dikha sakta hoon.`),
+  T('Beauty Parlour', 'Appointment Enquiry on WhatsApp',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Website par ek WhatsApp appointment button lagaya ja sakta hai jisse customer service aur preferred time ke saath message bhej sake.
+
+Isse aapko call par baar-baar details poochni nahi padti.
+
+Kya main iska demo dikha dun?`),
+  T('Beauty Parlour', 'Gallery & Work Showcase',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Aapke kaam ki photos ek sundar gallery mein dikhane se naye customers ko parlour ka style samajhne mein madad milti hai.
+
+Photos aap hi provide karein, main unhe achhe layout mein set kar dunga.
+
+Chahein to main ek sample gallery bhej sakta hoon.`),
+  T('Beauty Parlour', 'Short Demo Request',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Main beauty parlours ke liye website aur appointment enquiry system banata hoon.
+
+Agar aap permission dein, to main ek chhota demo dikhana chahunga. Koi commitment nahi hai.
+
+Aapke liye kaunsa time suitable rahega?`),
+
+  // ---------- RESTAURANT ----------
+  T('Restaurant', 'Digital Menu Website',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Customers restaurant jaane se pehle menu, rates aur photos dekhna pasand karte hain.
+
+Main aisi website banata hoon jisme digital menu, timings, location aur contact ek jagah hote hain, aur menu aap khud update kar sakte hain.
+
+Kya main {{businessName}} ke liye ek sample design share kar sakta hoon?`),
+  T('Restaurant', 'Table Booking Enquiry',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Website par ek table booking enquiry form lagaya ja sakta hai jisme guest date, time aur logon ki sankhya bata sake.
+
+Aap booking confirm karne se pehle sab details ek jagah dekh sakte hain.
+
+Agar aap chahein, to main iska demo dikha sakta hoon.`),
+  T('Restaurant', 'WhatsApp Order Enquiry',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Menu ke saath ek "Order on WhatsApp" button lagaya ja sakta hai jisse customer apna order seedha aapko message kar sake.
+
+Ye un restaurants ke liye simple option hai jo apna order system khud handle karte hain.
+
+Kya main ek sample dikha dun?`),
+  T('Restaurant', 'Food Photos & Location',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Khane ki achhi photos, restaurant ka ambience aur Google Maps location ek hi page par dikhane se naye customers ko aapko dhundhna aasan ho jata hai.
+
+Main aisa mobile-friendly layout banata hoon jo tez khule.
+
+Agar aap chahein, to {{businessName}} ke liye ek sample bhej sakta hoon.`),
+  T('Restaurant', 'Events & Party Bookings',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Birthday, family dinner ya small party ke liye ek alag enquiry page website par banaya ja sakta hai, jisme hall, capacity aur contact detail ho.
+
+Isse party ki enquiries ek jagah aa sakti hain.
+
+Kya main iska demo dikha sakta hoon?`),
+
+  // ---------- HOTEL ----------
+  T('Hotel', 'Rooms & Facilities Website',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Travellers aksar booking se pehle rooms, facilities, photos aur location online dekhte hain.
+
+Main hotels ke liye aisi website banata hoon jahan ye sab jaankari saaf aur mobile-friendly tareeke se dikhai jati hai.
+
+Kya main {{businessName}} ke liye ek sample design share kar sakta hoon?`),
+  T('Hotel', 'Booking Enquiry Form',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Website par ek booking enquiry form lagaya ja sakta hai jisme guest check-in date, room type aur contact detail bhej sake.
+
+Aap enquiry dekh kar apni availability ke hisaab se wapas contact kar sakte hain.
+
+Agar aap chahein, to main iska demo dikha sakta hoon.`),
+  T('Hotel', 'Photo Gallery & Nearby Places',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Hotel ke rooms ki photos ke saath aas-paas ke mandir, bazaar ya stations ki jaankari bhi website par di ja sakti hai, jo guests ke kaam aati hai.
+
+Map aur directions bhi saath mein lag jate hain.
+
+Kya main ek sample layout bhej dun?`),
+  T('Hotel', 'Banquet & Event Enquiries',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Agar aapke paas banquet hall ya garden hai, to uske liye alag page bana kar capacity, photos aur enquiry form diya ja sakta hai.
+
+Shaadi ya function ki enquiries ek jagah aa sakti hain.
+
+Agar aap chahein, to main iska ek sample dikha sakta hoon.`),
+  T('Hotel', 'Short Demo Request',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Main hotels aur guest houses ke liye website aur booking enquiry system banata hoon.
+
+Agar aap permission dein, to main ek 10 minute ka demo dikhana chahunga. Koi pressure nahi hai.
+
+Aapko kaunsa time theek rahega?`),
+
+  // ---------- REAL ESTATE ----------
+  T('Real Estate', 'Property Listing Website',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Property dhundhne wale log aksar online listings, photos aur location dekhkar shortlist karte hain.
+
+Main real estate businesses ke liye aisi website banata hoon jisme properties ki details, photos aur contact ek jagah hoti hain.
+
+Kya main {{businessName}} ke liye ek sample design share kar sakta hoon?`),
+  T('Real Estate', 'Buyer Enquiry Form',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Har property ke saath ek enquiry form lagaya ja sakta hai jisme interested person apna budget aur contact detail bhej sake.
+
+Aap saari enquiries ek jagah dekh kar apne hisaab se contact kar sakte hain.
+
+Agar aap chahein, to main iska demo dikha sakta hoon.`),
+  T('Real Estate', 'Project & Brochure Pages',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Kisi project ke liye alag page banaya ja sakta hai jisme layout, amenities, photos aur brochure download ka option ho.
+
+Sab details aap provide karein, main unhe clear tareeke se present kar dunga.
+
+Kya main ek sample project page bhej dun?`),
+  T('Real Estate', 'Location Map & Photo Gallery',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Property ki location Google Map par dikhana aur photos ko gallery mein rakhna buyers ke liye kaafi helpful hota hai.
+
+Website mobile par bhi saaf dikhti hai, jahan zyada tar log search karte hain.
+
+Agar aap chahein, to {{businessName}} ke liye ek sample dikha sakta hoon.`),
+  T('Real Estate', 'Short Demo Request',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Main real estate businesses ke liye property listing website banata hoon.
+
+Agar aap permission dein, to main ek chhota demo dikhana chahunga. Koi commitment nahi hai.
+
+Aapke liye kaunsa time suitable rahega?`),
+
+  // ---------- E-COMMERCE ----------
+  T('E-commerce', 'Online Product Catalogue',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Aapke products ko photos, naam aur price ke saath ek online catalogue mein dikhaya ja sakta hai, jise customers kahin se bhi dekh saken.
+
+Catalogue aap khud update kar sakein, aisa setup banaya ja sakta hai.
+
+Kya main {{businessName}} ke liye ek sample design share kar sakta hoon?`),
+  T('E-commerce', 'Online Store with Orders',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Agar aap online orders lena chahte hain, to ek simple online store banaya ja sakta hai jisme cart, checkout aur order list ho.
+
+Payment ke liye trusted payment gateways ka option diya ja sakta hai.
+
+Agar aap chahein, to main iska demo dikha sakta hoon.`),
+  T('E-commerce', 'WhatsApp Catalogue & Order Button',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Agar abhi aap WhatsApp par hi orders lete hain, to website par har product ke saath "Order on WhatsApp" button lagaya ja sakta hai.
+
+Isse customer ko product ki details aur order, dono ek jagah mil jate hain.
+
+Kya main ek sample dikha dun?`),
+  T('E-commerce', 'Product Categories & Search',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Jab products zyada ho jate hain, to categories aur search option se customer ko apni cheez dhundhna aasan hota hai.
+
+Main aisi website banata hoon jo phone par bhi tez aur saaf chale.
+
+Agar aap chahein, to {{businessName}} ke liye ek sample layout bhej sakta hoon.`),
+  T('E-commerce', 'Short Demo Request',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Main shops aur sellers ke liye online catalogue aur store websites banata hoon.
+
+Agar aap permission dein, to main ek 10 minute ka demo dikhana chahunga. Koi pressure nahi hai.
+
+Aapko kaunsa time theek rahega?`),
+
+  // ---------- FOLLOW-UP ----------
+  T('Follow-up', 'Gentle Check-in',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Pichhli baar maine website ke baare mein baat ki thi, bas yeh poochna chahta tha ki aapko dekhne ka mauka mila ya nahi.
+
+Agar abhi zaroorat nahi hai, to bilkul theek hai.`),
+  T('Follow-up', 'Sample Design Offer',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Pichhle message ke baad maine socha ki agar aap chahein, to {{businessName}} ke liye ek sample design bana kar dikha dun, taaki aapko idea mil sake.
+
+Agar aap interested hon, to bas bata dijiye.`),
+  T('Follow-up', 'Requirement Question',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Ek chhota sa sawal tha: {{businessName}} ke liye aapko website mein sabse zaroori kya lagta hai: enquiry form, photo gallery, ya online booking?
+
+Aapka jawab mujhe sahi suggestion dene mein madad karega.`),
+  T('Follow-up', 'Convenient Time to Talk',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Pichhli baat-cheet ke baad agar aap chahein, to main 10 minute ke call par details samjha sakta hoon.
+
+Aapko kaunsa time suitable rahega? Aap batayein, main usi hisaab se contact karunga.`),
+  T('Follow-up', 'Final Polite Follow-up',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Website ke regarding ye mera aakhri follow-up hai.
+
+Agar abhi aapki requirement nahi hai, to koi baat nahi. Aage kabhi zaroorat ho, to aap mujhse sampark kar sakte hain.
+
+Aapke time ke liye dhanyavaad.`),
+
+  // ---------- CUSTOM ----------
+  T('Custom', 'Custom Website Proposal',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Har business ki zaroorat alag hoti hai, isliye main aapke kaam ke hisaab se website ya digital tool design karta hoon.
+
+Agar aap apni requirement bata dein, to main {{businessName}} ke liye ek simple proposal share kar sakta hoon.`),
+  T('Custom', 'Booking or Enquiry System',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Agar aapke customers appointment, booking ya enquiry karte hain, to uske liye ek simple online form aur list system banaya ja sakta hai.
+
+Isse enquiries ek jagah organised rehti hain.
+
+Kya main iska ek short demo dikha sakta hoon?`),
+  T('Custom', 'Business Dashboard & Records',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Customer records, orders ya follow-ups register mein sambhalna mushkil ho sakta hai. Main ek simple web dashboard bana sakta hoon jahan ye sab ek jagah dikhe.
+
+Agar aap chahein, to aap batayein ki aap kya track karna chahte hain, main uske hisaab se idea share karunga.`),
+  T('Custom', 'Website Redesign',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Agar aapki website purani hai ya mobile par theek se nahi khulti, to main use naya aur saaf design de sakta hoon, aapke existing content ke saath.
+
+Chahein to main current site dekh kar kuch improvement ideas share kar dun?`),
+  T('Custom', 'Requirement Discussion',
+    `Namaste {{businessName}},
+
+Main Etah se hoon, mera naam Farheed hai. Main website aur custom digital tools banane ka kaam karta hoon.
+
+Abhi koi pitch nahi, bas yeh samajhna chahta hoon ki {{businessName}} ke liye aapko kis cheez ki zaroorat hai. Agar aap batayein, to main sahi suggestion de sakta hoon.`),
 ];
 
-module.exports = { CATEGORIES, TEMPLATES };
+module.exports = { CATEGORIES, TEMPLATES, CLOSING, SIGNATURE };

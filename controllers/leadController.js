@@ -2,31 +2,15 @@ const Lead = require('../models/Lead');
 const LeadActivity = require('../models/LeadActivity');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
-const { normalizePhone } = require('../utils/phone');
 const { getPreferences } = require('../services/settingsService');
 const { buildLeadFilter, buildSort } = require('../utils/leadFilter');
 const { parsePagination, pageMeta } = require('../utils/pagination');
 
-const EDITABLE = ['businessName', 'category', 'ownerName', 'phone', 'whatsappNumber', 'whatsappStatus', 'website', 'city', 'state', 'country',
-  'address', 'dataSource', 'contactSource', 'placeId', 'status', 'notes', 'lastContactedAt', 'nextFollowUpAt'];
+const { prepareNewLead, prepareLeadUpdate, importLeads, MAX_IMPORT } = require('../services/leadService');
+const { trackNoPhone } = require('../services/settingsService');
 
-const pick = (src) => EDITABLE.reduce((o, k) => (src[k] !== undefined ? { ...o, [k]: src[k] } : o), {});
-
-async function derive(data, existing) {
-  const out = { ...data };
-  const prefs = await getPreferences();
-  if (out.businessName !== undefined || out.city !== undefined) {
-    out.nameKey = String(out.businessName ?? existing?.businessName ?? '').trim().toLowerCase();
-    out.cityKey = String(out.city ?? existing?.city ?? '').trim().toLowerCase();
-  }
-  if (out.phone !== undefined) {
-    const n = normalizePhone(out.phone, prefs.defaultCountryCode);
-    out.phoneNormalized = n.valid ? n.digits : undefined;
-  }
-  if (out.website) out.website = /^https?:\/\//i.test(out.website) ? out.website : `https://${out.website}`;
-  ['nextFollowUpAt', 'lastContactedAt'].forEach((k) => { if (out[k] === '') out[k] = null; });
-  return out;
-}
+// Phone / validation failures come back as 400 with a stable `code` and the offending field.
+const validationError = (r) => new ApiError(400, r.message, [{ field: r.field, message: r.message }], r.code);
 
 async function findDuplicates(data, excludeId) {
   const or = [];
@@ -37,6 +21,23 @@ async function findDuplicates(data, excludeId) {
   const q = { $or: or };
   if (excludeId) q._id = { $ne: excludeId };
   return Lead.find(q).select('businessName phone city status placeId').limit(5).lean();
+}
+
+// The single place a new lead is written. Manual create, Google Places saves and bulk import ALL go through here.
+async function createLeadFrom(input, { prefs, user, force = false }) {
+  const prepared = prepareNewLead(input, prefs);
+  if (!prepared.ok) return { outcome: 'rejected', error: prepared };
+  const data = prepared.data;
+  if (data.placeId) { data.placeIdSavedAt = new Date(); if (!input.dataSource) data.dataSource = 'google_places_reference'; }
+  if (!force) {
+    const duplicates = await findDuplicates(data);
+    if (duplicates.length) return { outcome: 'duplicate', duplicates };
+  }
+  const lead = new Lead({ ...data, createdBy: user._id });
+  lead.$locals.defaultCountryCode = prefs.defaultCountryCode;
+  await lead.save();
+  await LeadActivity.create({ lead: lead._id, type: 'created', message: `Lead created (${lead.dataSource.replace(/_/g, ' ')})`, createdBy: user._id });
+  return { outcome: 'created', lead, warning: prepared.warning };
 }
 
 exports.list = asyncHandler(async (req, res) => {
@@ -56,16 +57,32 @@ exports.meta = asyncHandler(async (req, res) => {
 
 exports.create = asyncHandler(async (req, res) => {
   const prefs = await getPreferences();
-  const data = await derive({ country: prefs.defaultCountry, ...pick(req.body) });
-  if (!data.placeId) delete data.placeId;
-  if (data.placeId) { data.placeIdSavedAt = new Date(); if (!req.body.dataSource) data.dataSource = 'google_places_reference'; }
-  if (!req.body.force) {
-    const dupes = await findDuplicates(data);
-    if (dupes.length) return res.status(409).json({ message: 'A similar lead already exists', duplicates: dupes });
+  const r = await createLeadFrom(req.body, { prefs, user: req.user, force: Boolean(req.body.force) });
+  if (r.outcome === 'rejected') {
+    if (r.error.code === 'PHONE_REQUIRED') await trackNoPhone({ rejectedSaves: 1 });
+    throw validationError(r.error);
   }
-  const lead = await Lead.create({ ...data, createdBy: req.user._id });
-  await LeadActivity.create({ lead: lead._id, type: 'created', message: `Lead created (${lead.dataSource.replace(/_/g, ' ')})`, createdBy: req.user._id });
-  res.status(201).json({ data: lead });
+  if (r.outcome === 'duplicate') return res.status(409).json({ message: 'A similar lead already exists', duplicates: r.duplicates });
+  res.status(201).json({ data: r.lead, ...(r.warning ? { warning: r.warning } : {}) });
+});
+
+// Bulk save (Google Places "save selected / save all", imports). Records without a valid phone number are skipped and reported.
+exports.importMany = asyncHandler(async (req, res) => {
+  const prefs = await getPreferences();
+  const { leads, defaults = {}, force = false } = req.body;
+  if (!Array.isArray(leads) || !leads.length) throw new ApiError(400, 'Provide a non-empty "leads" array');
+  if (leads.length > MAX_IMPORT) throw new ApiError(400, `Import at most ${MAX_IMPORT} leads per request`);
+  const items = leads.map((l) => ({ ...defaults, ...l }));
+  const out = await importLeads(items, {
+    prefs, force: Boolean(force), findDuplicates,
+    createLead: async (data) => {
+      const r = await createLeadFrom(data, { prefs, user: req.user, force: true }); // duplicates were already checked by importLeads
+      if (r.outcome !== 'created') throw new Error(r.error?.message || 'Could not save lead');
+      return r.lead;
+    },
+  });
+  await trackNoPhone({ rejectedSaves: out.summary.skippedNoPhone });
+  res.json(out);
 });
 
 exports.get = asyncHandler(async (req, res) => {
@@ -78,17 +95,20 @@ exports.get = asyncHandler(async (req, res) => {
 exports.update = asyncHandler(async (req, res) => {
   const lead = await Lead.findById(req.params.id);
   if (!lead) throw new ApiError(404, 'Lead not found');
-  const patch = await derive(pick(req.body), lead);
-  if (patch.placeId === '') patch.placeId = undefined;
+  const prefs = await getPreferences();
+  const prepared = prepareLeadUpdate(req.body, lead, prefs);
+  if (!prepared.ok) throw validationError(prepared);
+  const { patch } = prepared;
   if (!req.body.force) {
-    const dupes = await findDuplicates({ ...patch, nameKey: patch.nameKey ?? lead.nameKey, cityKey: patch.cityKey ?? lead.cityKey, phoneNormalized: patch.phoneNormalized }, lead._id);
+    const dupes = await findDuplicates({ nameKey: patch.nameKey ?? lead.nameKey, cityKey: patch.cityKey ?? lead.cityKey, phoneNormalized: patch.phoneNormalized, placeId: patch.placeId }, lead._id);
     if (dupes.length) return res.status(409).json({ message: 'Another lead matches these details', duplicates: dupes });
   }
   const prevStatus = lead.status;
   const prevFollowUp = lead.nextFollowUpAt?.getTime();
+  const acts = [];
+  lead.$locals.defaultCountryCode = prefs.defaultCountryCode;
   lead.set(patch);
   await lead.save();
-  const acts = [];
   if (patch.status && patch.status !== prevStatus) acts.push({ type: 'status_change', message: `Status changed: ${prevStatus} → ${lead.status}` });
   if (patch.nextFollowUpAt !== undefined && lead.nextFollowUpAt?.getTime() !== prevFollowUp) {
     acts.push({ type: 'follow_up_set', message: lead.nextFollowUpAt ? `Follow-up set for ${lead.nextFollowUpAt.toDateString()}` : 'Follow-up cleared' });
@@ -122,8 +142,9 @@ exports.bulkUpdate = asyncHandler(async (req, res) => {
     affected = (await Lead.deleteMany({ _id: { $in: ids } })).deletedCount;
     await LeadActivity.deleteMany({ lead: { $in: ids } });
   } else if (action === 'status') {
-    affected = (await Lead.updateMany({ _id: { $in: ids } }, { status: req.body.status })).modifiedCount;
-    await LeadActivity.insertMany(ids.map((id) => ({ lead: id, type: 'bulk_update', message: `Status set to ${req.body.status} (bulk)`, createdBy: req.user._id })));
+    const { status } = req.body;
+    affected = (await Lead.updateMany({ _id: { $in: ids } }, { status })).modifiedCount;
+    await LeadActivity.insertMany(ids.map((id) => ({ lead: id, type: 'bulk_update', message: `Status set to ${status} (bulk)`, createdBy: req.user._id })));
   } else if (action === 'followUp') {
     affected = (await Lead.updateMany({ _id: { $in: ids } }, { nextFollowUpAt: new Date(req.body.nextFollowUpAt) })).modifiedCount;
     await LeadActivity.insertMany(ids.map((id) => ({ lead: id, type: 'follow_up_set', message: `Follow-up set (bulk) for ${new Date(req.body.nextFollowUpAt).toDateString()}`, createdBy: req.user._id })));

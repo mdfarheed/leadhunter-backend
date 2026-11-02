@@ -2,6 +2,7 @@ const MessageTemplate = require('../models/MessageTemplate');
 const AppSetting = require('../models/AppSetting');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
+const { nextInRotation } = require('../utils/templateRotation');
 
 const pick = (b) => ({ name: b.name, category: b.category, body: b.body, ...(b.isActive !== undefined ? { isActive: b.isActive } : {}) });
 
@@ -37,6 +38,9 @@ exports.remove = asyncHandler(async (req, res) => {
     prefs.markModified('value');
     await prefs.save();
   }
+  if (t.seedKey) { // remember that a built-in starter template was removed on purpose; the seed will not recreate it
+    await AppSetting.findOneAndUpdate({ key: 'deletedSeedTemplates' }, { $addToSet: { 'value.keys': t.seedKey } }, { upsert: true });
+  }
   if (t.isDefault) { // promote another active template of the same category
     const next = await MessageTemplate.findOne({ category: t.category, isActive: true }).sort({ createdAt: 1 });
     if (next) { next.isDefault = true; await next.save(); }
@@ -52,4 +56,23 @@ exports.setDefault = asyncHandler(async (req, res) => {
   t.isDefault = true;
   await t.save();
   res.json({ data: t });
+});
+
+// ---- Rotation: which template is next for this category? (read-only; nothing advances until a message is opened) ----
+const rotationState = async () => (await AppSetting.findOne({ key: 'templateRotation' }).lean())?.value || {};
+
+exports.next = asyncHandler(async (req, res) => {
+  const { category } = req.query;
+  const list = await MessageTemplate.find({ category, isActive: true }).lean();
+  const state = await rotationState();
+  const next = nextInRotation(list, state[category]);
+  res.json({ data: next ? next.template : null, position: next?.position || 0, total: next?.total || 0 });
+});
+
+// Called when the admin opens WhatsApp with a template: the following lead will then get the next template.
+exports.markUsed = asyncHandler(async (req, res) => {
+  const t = await MessageTemplate.findById(req.body.templateId).lean();
+  if (!t) throw new ApiError(404, 'Template not found');
+  await AppSetting.findOneAndUpdate({ key: 'templateRotation' }, { $set: { [`value.${t.category}`]: String(t._id) } }, { upsert: true });
+  res.json({ ok: true });
 });

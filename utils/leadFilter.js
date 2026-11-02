@@ -8,7 +8,7 @@ function buildLeadFilter(q = {}) {
   const and = [];
   if (q.q) {
     const rx = new RegExp(escapeRegex(String(q.q).trim()), 'i');
-    and.push({ $or: [{ businessName: rx }, { phone: rx }, { whatsappNumber: rx }, { address: rx }, { notes: rx }, { ownerName: rx }, { website: rx }] });
+    and.push({ $or: [{ businessName: rx }, { phone: rx }, { phoneNormalized: rx }, { whatsappNumber: rx }, { address: rx }, { notes: rx }, { ownerName: rx }, { website: rx }] });
   }
   if (q.status) f.status = { $in: String(q.status).split(',') };
   if (q.category) f.category = { $in: String(q.category).split(',') };
@@ -20,6 +20,11 @@ function buildLeadFilter(q = {}) {
   if (q.hasPhone === 'no' || q.hasPhone === 'false') and.push({ $or: [{ phone: '' }, { phone: null }, { phone: { $exists: false } }] });
   if (q.hasWebsite === 'yes' || q.hasWebsite === 'true') and.push({ website: { $nin: ['', null] } });
   if (q.hasWebsite === 'no' || q.hasWebsite === 'false') and.push({ $or: [{ website: '' }, { website: null }, { website: { $exists: false } }] });
+  // phoneStatus: valid = parses; invalid = a phone is stored but does not parse (legacy); missing = no phone at all
+  const hasPhoneText = { phone: { $nin: ['', null] } };
+  if (q.phoneStatus === 'valid') and.push({ phoneNormalized: { $nin: ['', null] } });
+  if (q.phoneStatus === 'invalid') and.push({ ...hasPhoneText, $or: [{ phoneNormalized: { $exists: false } }, { phoneNormalized: null }, { phoneNormalized: '' }] });
+  if (q.phoneStatus === 'missing') and.push({ $or: [{ phone: '' }, { phone: null }, { phone: { $exists: false } }] });
   if (q.followUp === 'overdue') f.nextFollowUpAt = { $lt: startOfDay() };
   else if (q.followUp === 'today') f.nextFollowUpAt = { $gte: startOfDay(), $lte: endOfDay() };
   else if (q.followUp === 'upcoming') f.nextFollowUpAt = { $gt: endOfDay() };

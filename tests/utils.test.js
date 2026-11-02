@@ -19,13 +19,13 @@ test('template: replaces placeholders', () => {
   assert.strictEqual(r.text, 'Hi Sharma Clinic from Etah'); assert.deepStrictEqual(r.missing, []);
 });
 test('template: uses fallback and reports missing', () => {
-  const r = renderTemplate('Namaste {{businessName}} ji, {{ownerName}}', { businessName: 'X' });
-  assert.strictEqual(r.text, 'Namaste X ji, Sir/Madam'); assert.deepStrictEqual(r.missing, ['ownerName']);
+  const r = renderTemplate('Namaste {{businessName}}, {{ownerName}}', { businessName: 'X' });
+  assert.strictEqual(r.text, 'Namaste X, Team'); assert.deepStrictEqual(r.missing, ['ownerName']);
 });
 test('template: unknown placeholders detected', () => assert.deepStrictEqual(findUnsupported('{{businessName}} {{foo}}'), ['foo']));
 test('whatsapp url encodes message', () => {
-  const u = buildWhatsAppUrl('919876543210', 'Namaste ji,\nKya hal? & more');
-  assert.strictEqual(u, 'https://wa.me/919876543210?text=Namaste%20ji%2C%0AKya%20hal%3F%20%26%20more');
+  const u = buildWhatsAppUrl('919876543210', 'Namaste,\nKya hal? & more');
+  assert.strictEqual(u, 'https://wa.me/919876543210?text=Namaste%2C%0AKya%20hal%3F%20%26%20more');
 });
 test('lead filter: builds status / phone filters and escapes regex', () => {
   const f = buildLeadFilter({ status: 'New,Interested', hasPhone: 'yes', q: 'a.b(' });
