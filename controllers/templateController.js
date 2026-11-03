@@ -59,12 +59,14 @@ exports.setDefault = asyncHandler(async (req, res) => {
 });
 
 // ---- Rotation: which template is next for this category? (read-only; nothing advances until a message is opened) ----
-const rotationState = async () => (await AppSetting.findOne({ key: 'templateRotation' }).lean())?.value || {};
+// Rotation is kept per user, so each user's leads cycle through the templates independently.
+const rotationKey = (req) => `templateRotation:${req.user._id}`;
+const rotationState = async (req) => (await AppSetting.findOne({ key: rotationKey(req) }).lean())?.value || {};
 
 exports.next = asyncHandler(async (req, res) => {
   const { category } = req.query;
   const list = await MessageTemplate.find({ category, isActive: true }).lean();
-  const state = await rotationState();
+  const state = await rotationState(req);
   const next = nextInRotation(list, state[category]);
   res.json({ data: next ? next.template : null, position: next?.position || 0, total: next?.total || 0 });
 });
@@ -73,6 +75,6 @@ exports.next = asyncHandler(async (req, res) => {
 exports.markUsed = asyncHandler(async (req, res) => {
   const t = await MessageTemplate.findById(req.body.templateId).lean();
   if (!t) throw new ApiError(404, 'Template not found');
-  await AppSetting.findOneAndUpdate({ key: 'templateRotation' }, { $set: { [`value.${t.category}`]: String(t._id) } }, { upsert: true });
+  await AppSetting.findOneAndUpdate({ key: rotationKey(req) }, { $set: { [`value.${t.category}`]: String(t._id) } }, { upsert: true });
   res.json({ ok: true });
 });

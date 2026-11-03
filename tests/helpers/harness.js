@@ -70,6 +70,7 @@ function makeModel(real) {
         fieldDefs.forEach(([k, d]) => { if (this[k] === undefined && d && d.default !== undefined) this[k] = typeof d.default === 'function' ? d.default() : d.default; });
       } else this._orig = clone({ ...this });
     }
+    async deleteOne() { const i = store.indexOf(this); if (i >= 0) store.splice(i, 1); return this; }
     isModified(p) { return this.isNew ? this[p] !== undefined : JSON.stringify(this[p]) !== JSON.stringify(this._orig[p]); }
     invalidate(p, message) { this._invalid.push({ path: p, message }); }
     set(obj) { Object.entries(obj).forEach(([k, v]) => { this[k] = v; }); return this; }
@@ -119,13 +120,20 @@ function makeModel(real) {
     }
     static async deleteMany(filter) { const keep = store.filter((d) => !matches(d, filter)); const n = store.length - keep.length; store.splice(0, store.length, ...keep); return { deletedCount: n }; }
     static async findByIdAndDelete(id) { const d = store.find((x) => x._id === id); if (d) store.splice(store.indexOf(d), 1); return d || null; }
-    static async aggregate(pipeline) { // supports the $group-by-field shapes the dashboard uses
+    static async aggregate(pipeline) { // supports $match + one $group-by-field with {$sum: 1}, the shapes the app uses
+      const matchers = pipeline.filter((st) => st.$match).map((st) => st.$match);
       const g = pipeline.find((st) => st.$group).$group;
-      const key = (d) => { const e = g._id; if (typeof e === 'string') return d[e.slice(1)]; return d[e.$ifNull[0].slice(1)] ?? e.$ifNull[1]; };
+      const key = (d) => {
+        const e = g._id;
+        if (typeof e === 'string') return d[e.slice(1)] ?? null;
+        if (e.$dateToString) return new Date(d[e.$dateToString.date.slice(1)]).toISOString().slice(0, 7); // '%Y-%m'
+        return d[e.$ifNull[0].slice(1)] ?? e.$ifNull[1];
+      };
       const counts = new Map();
-      store.forEach((d) => counts.set(key(d), (counts.get(key(d)) || 0) + 1));
+      store.filter((d) => matchers.every((m) => matches(d, m))).forEach((d) => counts.set(key(d), (counts.get(key(d)) || 0) + 1));
       return [...counts].map(([_id, count]) => ({ _id, count }));
     }
+    static async findOneAndDelete(filter) { const d = store.find((x) => matches(x, filter)); if (d) store.splice(store.indexOf(d), 1); return d || null; }
     static async distinct(f) { return [...new Set(store.map((d) => d[f]))]; }
     static _store = store;
     static _reset() { store.length = 0; }
@@ -143,7 +151,9 @@ function makeAppSetting() {
   const chain = (v) => ({ lean: async () => v, then: (r, j) => Promise.resolve(v).then(r, j) });
   return {
     findOne: ({ key }) => chain(rows.get(key) ? { key, value: rows.get(key) } : null),
+    deleteMany: async ({ key }) => { const keys = key.$in || [key]; keys.forEach((k) => rows.delete(k)); return {}; },
     findOneAndUpdate: (filter, update) => {
+      if (update.value) { rows.set(filter.key, update.value); return Promise.resolve(update.value); }
       const cur = rows.get(filter.key) || {};
       Object.entries(update.$inc || {}).forEach(([p, n]) => { const k = p.replace(/^value\./, ''); cur[k] = (cur[k] || 0) + n; });
       Object.entries(update.$set || {}).forEach(([p, n]) => { const k = p.replace(/^value\./, ''); cur[k] = n; });
@@ -190,7 +200,7 @@ function install() {
   const LeadActivity = makeModel(require(abs('models/LeadActivity.js')));
   require.cache[abs('models/Lead.js')].exports = Lead;
   require.cache[abs('models/LeadActivity.js')].exports = LeadActivity;
-  ['SearchHistory', 'BusinessCategory', 'MessageTemplate'].forEach((n) => { const f = abs(`models/${n}.js`); require.cache[f] ? null : require(f); require.cache[f].exports = makeModel(require.cache[f].exports); }); // eslint-disable-line no-unused-expressions
+  ['SearchHistory', 'BusinessCategory', 'MessageTemplate', 'User', 'VisitContact'].forEach((n) => { const f = abs(`models/${n}.js`); require.cache[f] ? null : require(f); require.cache[f].exports = makeModel(require.cache[f].exports); }); // eslint-disable-line no-unused-expressions
   require.cache[abs('models/AppSetting.js')] = { id: abs('models/AppSetting.js'), filename: abs('models/AppSetting.js'), loaded: true, exports: appSetting };
   return { Lead, LeadActivity, appSetting, routes, uninstall: () => { Module._load = orig; } };
 }

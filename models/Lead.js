@@ -50,7 +50,9 @@ leadSchema.pre('validate', function enforcePhone(next) {
   next();
 });
 
-leadSchema.index({ placeId: 1 }, { unique: true, partialFilterExpression: { placeId: { $type: 'string' } } });
+// A Google place can be saved once PER USER (two users may both save the same business).
+leadSchema.index({ createdBy: 1, placeId: 1 }, { unique: true, partialFilterExpression: { placeId: { $type: 'string' } }, name: 'uniq_owner_place' });
+leadSchema.index({ createdBy: 1, createdAt: -1 });
 leadSchema.index({ category: 1 });
 leadSchema.index({ city: 1 });
 leadSchema.index({ createdAt: -1 });

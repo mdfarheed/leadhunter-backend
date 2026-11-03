@@ -9,8 +9,9 @@
     "dev": "nodemon server.js",
     "create-admin": "node scripts/createAdmin.js",
     "seed": "node scripts/seed.js",
-    "test": "node --test tests/utils.test.js tests/compliance.test.js tests/templates.test.js tests/api-flow.test.js",
-    "seed:templates": "node scripts/seedProfessionalTemplates.js"
+    "test": "node --test tests/utils.test.js tests/compliance.test.js tests/templates.test.js tests/api-flow.test.js tests/multiuser.test.js",
+    "seed:templates": "node scripts/seedProfessionalTemplates.js",
+    "migrate:users": "node scripts/migrateUsers.js"
   },
   "engines": {
     "node": ">=18"

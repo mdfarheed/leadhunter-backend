@@ -1,10 +1,11 @@
-const PLACEHOLDERS = ['businessName', 'category', 'city', 'ownerName', 'developerName'];
+const PLACEHOLDERS = ['businessName', 'category', 'city', 'ownerName', 'developerName', 'myCity'];
 const FALLBACKS = {
   businessName: 'Team',
   category: 'business',
   city: 'aapka shehar',
   ownerName: 'Team',
   developerName: '[Your Name]',
+  myCity: '[your city]', // the SENDER's own city (Settings -> Profile); never the lead's city
 };
 
 // Replaces supported {{placeholders}}; unknown placeholders are left untouched. Reports which values were missing.

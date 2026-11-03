@@ -8,7 +8,7 @@ const { planSeed, isEmptyPlan, sha256 } = require('../utils/templateSeedPlan');
 const legacy = require('../utils/legacyTemplateHashes.json');
 
 const CATEGORIES = ['General Business', 'School', 'College', 'Hospital', 'Clinic', 'Dental Clinic', 'Salon', 'Beauty Parlour', 'Restaurant', 'Hotel', 'Real Estate', 'E-commerce', 'Follow-up', 'Custom'];
-const vars = { businessName: 'Sharma Clinic', category: 'Clinic', city: 'Etah', developerName: 'Farheed' };
+const vars = { businessName: 'Sharma Clinic', category: 'Clinic', city: 'Etah', developerName: 'Farheed', myCity: 'Etah' };
 
 test('all 14 categories have exactly five default templates, one default each', () => {
   assert.strictEqual(TEMPLATES.length, 70);
@@ -39,8 +39,17 @@ test('templates avoid forbidden greetings and risky claims', () => {
 });
 test('every template ends with the YES / STOP question, right before the signature', () => {
   for (const t of TEMPLATES) {
-    assert.match(t.body, /Agar aap interested hain, to "YES" bol dijiye\. Agar aapko is tarah ke messages nahi chahiye, to "STOP" type kar dijiye\.\n\nRegards,\nFarheed\nWeb Development & Digital Solutions$/, t.seedKey);
+    assert.match(t.body, /Agar aap interested hain, to "YES" bol dijiye\. Agar aapko is tarah ke messages nahi chahiye, to "STOP" type kar dijiye\.\n\nRegards,\n\{\{developerName\}\}\nWeb Development & Digital Solutions$/, t.seedKey);
   }
+});
+test('the sender intro is dynamic per user: own city + own name, never the lead\'s city, and nothing is hard-coded', () => {
+  for (const t of TEMPLATES) assert.ok(!/Etah|Farheed/.test(t.body), `${t.seedKey} has a hard-coded city/name`);
+  const body = TEMPLATES.find((t) => t.seedKey === 'salon-1').body;
+  const agra = renderTemplate(body, { ...vars, myCity: 'Agra', developerName: 'Rahul', city: 'Delhi' }).text; // sender in Agra, lead in Delhi
+  assert.ok(agra.includes('Main Agra se hoon, mera naam Rahul hai.') && agra.includes('Regards,\nRahul\n'));
+  assert.ok(!agra.includes('Main Delhi se hoon'));
+  const missing = renderTemplate(body, { businessName: 'X', developerName: 'Rahul' });
+  assert.deepStrictEqual(missing.missing, ['myCity']); assert.ok(missing.text.includes('[your city]'));
 });
 test('missing placeholder values fall back to neutral text (no Sir/Madam)', () => {
   const r = renderTemplate('Namaste {{businessName}} {{ownerName}}', {});
@@ -153,4 +162,21 @@ test('WhatsAppModal opens wa.me only from the button handler and never records a
   assert.match(openFn, /if \(!canOpen\) return;/);
   assert.match(openFn, /buildWhatsAppUrl\(phone\.digits, message\)/);
   assert.match(openFn, /templatesApi\.markUsed\(selected\._id\)/); // rotation advances on open
+});
+
+test('ensureIndexes drops only the clashing old index (seedKey_1), never one the schema wants (category_1); rethrows other errors', async () => {
+  const { ensureIndexes } = require('../utils/ensureIndexes');
+  let created = 0; const dropped = [];
+  const Model = {
+    // same shape as the real MessageTemplate: a plain category index AND a partial unique index on the same key
+    schema: { indexes: () => [[{ category: 1 }, {}], [{ category: 1, isDefault: 1 }, {}], [{ category: 1 }, { name: 'uniq_default_per_category' }], [{ seedKey: 1 }, { name: 'uniq_seed_key' }]] },
+    collection: {
+      indexes: async () => [{ name: '_id_', key: { _id: 1 } }, { name: 'seedKey_1', key: { seedKey: 1 } }, { name: 'category_1', key: { category: 1 } }, { name: 'category_1_isDefault_1', key: { category: 1, isDefault: 1 } }],
+      dropIndex: async (n) => { dropped.push(n); },
+    },
+    createIndexes: async () => { created += 1; if (created === 1) { const e = new Error('Index already exists with a different name: seedKey_1'); e.code = 85; throw e; } },
+  };
+  assert.deepStrictEqual((await ensureIndexes(Model)).dropped, ['seedKey_1']);
+  assert.deepStrictEqual(dropped, ['seedKey_1']); assert.strictEqual(created, 2);
+  await assert.rejects(() => ensureIndexes({ createIndexes: async () => { throw new Error('boom'); } }), /boom/);
 });

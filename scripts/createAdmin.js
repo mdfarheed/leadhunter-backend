@@ -26,7 +26,7 @@ function prompter() {
 (async () => {
   await connectDB();
   const force = process.argv.includes('--force');
-  if (!force && (await User.countDocuments({ role: 'admin' })) > 0) {
+  if (!force && (await User.countDocuments({ role: { $ne: 'user' } })) > 0) {
     console.error('An admin already exists. Re-run with --force to create another one.');
     return;
   }
@@ -42,7 +42,7 @@ function prompter() {
   if (!name || !/^\S+@\S+\.\S+$/.test(email || '')) throw new Error('A name and a valid email are required');
   if (!password || password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) throw new Error('Password must be 8+ characters with letters and numbers');
   if (await User.exists({ email: email.toLowerCase() })) throw new Error('A user with that email already exists');
-  await User.create({ name, email, password, developerName: developerName || name });
+  await User.create({ name, email, password, developerName: developerName || name, role: 'admin', city: process.env.ADMIN_CITY || 'Etah' });
   const seeded = await seedAll();
   console.log(`\nAdmin "${email}" created. Seeded ${seeded.categories} categories and ${seeded.templates} message templates.`);
 })()

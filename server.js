@@ -57,6 +57,7 @@ app.use(errorHandler);
 let server;
 async function start() {
   await connectDB();
+  await require('./utils/legacyIndexes').dropLegacyLeadIndexes(mongoose.models.Lead).then((d) => d.length && console.log(`[db] dropped old index: ${d.join(', ')}`)).catch((e) => console.error('[db] could not drop old Lead index:', e.message));
   await Promise.all(Object.values(mongoose.models).map((m) => m.init().catch((e) => console.error(`[db] index build failed for ${m.modelName}: ${e.message}`))));
   server = app.listen(env.port, () => console.log(`[server] LeadHunter API listening on :${env.port} (${env.nodeEnv})`));
 }

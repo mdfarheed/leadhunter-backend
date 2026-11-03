@@ -11,6 +11,7 @@ exports.login = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email }).select('+password');
   const ok = await bcrypt.compare(password, user ? user.password : DUMMY_HASH);
   if (!user || !ok) throw new ApiError(401, 'Invalid email or password');
+  if (user.active === false) throw new ApiError(403, 'This account has been disabled. Contact the administrator.');
   res.json({ token: signToken(user), user: user.toPublic() });
 });
 

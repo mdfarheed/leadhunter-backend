@@ -2,6 +2,7 @@ const XLSX = require('xlsx');
 const Lead = require('../models/Lead');
 const asyncHandler = require('../utils/asyncHandler');
 const { buildLeadFilter, buildSort } = require('../utils/leadFilter');
+const { withOwner } = require('../utils/scope');
 
 const fmt = (d) => (d ? new Date(d).toISOString().slice(0, 10) : '');
 const COLUMNS = [
@@ -13,16 +14,16 @@ const COLUMNS = [
 // Spreadsheet formula-injection guard
 const safe = (v) => (typeof v === 'string' && /^[=+\-@\t\r]/.test(v) ? `'${v}` : v);
 
-async function rows(query) {
-  const leads = await Lead.find(buildLeadFilter(query)).sort(buildSort(query)).limit(50000).lean();
+async function rows(query, user) {
+  const leads = await Lead.find(withOwner(user, buildLeadFilter(query))).sort(buildSort(query)).limit(50000).lean();
   return leads.map((l) => Object.fromEntries(COLUMNS.map(([h, fn]) => [h, safe(fn(l) ?? '')])));
 }
 const stamp = () => new Date().toISOString().slice(0, 10);
 
-exports.json = asyncHandler(async (req, res) => { const data = await rows(req.query); res.json({ data, total: data.length }); });
+exports.json = asyncHandler(async (req, res) => { const data = await rows(req.query, req.user); res.json({ data, total: data.length }); });
 
 exports.csv = asyncHandler(async (req, res) => {
-  const data = await rows(req.query);
+  const data = await rows(req.query, req.user);
   const esc = (v) => `"${String(v).replace(/"/g, '""')}"`;
   const head = COLUMNS.map(([h]) => esc(h)).join(',');
   const body = data.map((r) => COLUMNS.map(([h]) => esc(r[h])).join(',')).join('\r\n');
@@ -32,7 +33,7 @@ exports.csv = asyncHandler(async (req, res) => {
 });
 
 exports.excel = asyncHandler(async (req, res) => {
-  const data = await rows(req.query);
+  const data = await rows(req.query, req.user);
   const ws = XLSX.utils.json_to_sheet(data, { header: COLUMNS.map(([h]) => h) });
   ws['!cols'] = COLUMNS.map(([h]) => ({ wch: Math.max(h.length + 2, h === 'Notes' || h === 'Address' ? 40 : 16) }));
   const wb = XLSX.utils.book_new();

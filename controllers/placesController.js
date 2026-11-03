@@ -6,6 +6,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ApiError = require('../utils/ApiError');
 const { getPreferences, getUsage, trackDiscovered, trackNoPhone } = require('../services/settingsService');
 const { checkPhone } = require('../utils/phone');
+const { withOwner } = require('../utils/scope');
 
 // Abort the Google request if the browser cancels / disconnects.
 function abortOnClose(req, res) {
@@ -16,8 +17,8 @@ function abortOnClose(req, res) {
 
 const COUNTRY_REGION = { india: 'IN' };
 
-async function context(b) {
-  const prefs = await getPreferences();
+async function context(b, user) {
+  const prefs = await getPreferences(user);
   const city = b.city ?? prefs.defaultCity;
   const state = b.state ?? prefs.defaultState;
   const country = b.country ?? prefs.defaultCountry;
@@ -46,9 +47,9 @@ function phoneInfo(p, cc) {
 }
 
 // Flags results that already exist as CRM leads (duplicate detection by Place ID) and whether each can be saved (phone present).
-async function annotate(list, cc) {
+async function annotate(list, cc, user) {
   const ids = list.map((p) => p.placeId);
-  const saved = await Lead.find({ placeId: { $in: ids } }).select('placeId').lean();
+  const saved = await Lead.find(withOwner(user, { placeId: { $in: ids } })).select('placeId').lean();
   const map = new Map(saved.map((l) => [l.placeId, String(l._id)]));
   return list.map((p) => ({ ...p, ...phoneInfo(p, cc), savedLeadId: map.get(p.placeId) || null }));
 }
@@ -69,14 +70,14 @@ async function recordHistory(req, { searchType, ctx, b, count, extra = {} }) {
 
 exports.textSearch = asyncHandler(async (req, res) => {
   const b = req.body;
-  const ctx = await context(b);
+  const ctx = await context(b, req.user);
   const term = b.keyword || ctx.cat?.searchTerm || b.category;
   const query = `${term} in ${[ctx.city, ctx.state, ctx.country].filter(Boolean).join(', ')}`;
   const result = await places.textSearch({
     query, pageToken: b.pageToken, pageSize: b.pageSize || 20, minRating: b.minRating,
     includeContact: wantsContact(b), includeRating: b.includeRating !== false, regionCode: ctx.regionCode,
   }, abortOnClose(req, res));
-  const prefs = await getPreferences();
+  const prefs = await getPreferences(req.user);
   await trackDiscovered(result.places.length);
   const contactFetched = wantsContact(b);
   const noPhone = countNoPhone(result.places, prefs.defaultCountryCode, contactFetched);
@@ -84,12 +85,12 @@ exports.textSearch = asyncHandler(async (req, res) => {
   const filtered = applyFilters(result.places, b);
   let historyId = null;
   if (!b.pageToken) historyId = await recordHistory(req, { searchType: 'text', ctx, b, count: filtered.length, extra: { query } });
-  res.json({ places: await annotate(filtered, prefs.defaultCountryCode), fetchedCount: result.places.length, noPhoneCount: noPhone, contactFetched, nextPageToken: result.nextPageToken, query, historyId });
+  res.json({ places: await annotate(filtered, prefs.defaultCountryCode, req.user), fetchedCount: result.places.length, noPhoneCount: noPhone, contactFetched, nextPageToken: result.nextPageToken, query, historyId });
 });
 
 exports.nearbySearch = asyncHandler(async (req, res) => {
   const b = req.body;
-  const ctx = await context(b);
+  const ctx = await context(b, req.user);
   const signal = abortOnClose(req, res);
   let lat = Number(b.latitude);
   let lng = Number(b.longitude);
@@ -111,7 +112,7 @@ exports.nearbySearch = asyncHandler(async (req, res) => {
       includeRating: b.includeRating !== false, regionCode: ctx.regionCode, bias: { lat, lng, radius },
     }, signal);
   }
-  const prefs = await getPreferences();
+  const prefs = await getPreferences(req.user);
   await trackDiscovered(result.places.length);
   const contactFetched = wantsContact(b);
   const noPhone = countNoPhone(result.places, prefs.defaultCountryCode, contactFetched);
@@ -119,24 +120,24 @@ exports.nearbySearch = asyncHandler(async (req, res) => {
   const filtered = applyFilters(result.places, b);
   let historyId = null;
   if (!b.pageToken) historyId = await recordHistory(req, { searchType: 'nearby', ctx, b, count: filtered.length, extra: { radius, latitude: lat, longitude: lng, mode } });
-  res.json({ places: await annotate(filtered, prefs.defaultCountryCode), fetchedCount: result.places.length, noPhoneCount: noPhone, contactFetched, nextPageToken: result.nextPageToken, center: { lat, lng, ...(center ? { name: center.name } : {}) }, mode, historyId });
+  res.json({ places: await annotate(filtered, prefs.defaultCountryCode, req.user), fetchedCount: result.places.length, noPhoneCount: noPhone, contactFetched, nextPageToken: result.nextPageToken, center: { lat, lng, ...(center ? { name: center.name } : {}) }, mode, historyId });
 });
 
 exports.details = asyncHandler(async (req, res) => {
   const place = await places.details(req.params.placeId, {
     includeContact: req.query.contact !== 'false', includeRating: req.query.rating !== 'false',
   }, abortOnClose(req, res));
-  const saved = await Lead.findOne({ placeId: place.placeId }).select('_id').lean();
-  const prefs = await getPreferences();
+  const saved = await Lead.findOne(withOwner(req.user, { placeId: place.placeId })).select('_id').lean();
+  const prefs = await getPreferences(req.user);
   res.json({ place: { ...place, ...(req.query.contact !== 'false' ? phoneInfo(place, prefs.defaultCountryCode) : {}), savedLeadId: saved ? String(saved._id) : null } });
 });
 
 exports.resolveCity = asyncHandler(async (req, res) => {
-  const ctx = await context(req.body);
+  const ctx = await context(req.body, req.user);
   res.json(await places.resolveCity(ctx, abortOnClose(req, res)));
 });
 
-exports.usage = asyncHandler(async (req, res) => res.json({ configured: places.isConfigured(), usage: await getUsage() }));
+exports.usage = asyncHandler(async (req, res) => res.json({ configured: places.isConfigured(), usage: await getUsage(req.user) }));
 
 exports.test = asyncHandler(async (req, res) => {
   if (!places.isConfigured()) return res.status(200).json({ ok: false, message: 'GOOGLE_PLACES_API_KEY is not set in backend/.env' });

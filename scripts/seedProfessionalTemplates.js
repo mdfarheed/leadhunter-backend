@@ -55,7 +55,7 @@ if (require.main === module) {
       console.log(`  created: ${r.created} | upgraded to new text: ${r.upgraded} | adopted from older seed: ${r.adopted} | already present (untouched): ${r.unchanged}`);
       console.log(`  deleted-by-you, skipped: ${r.skippedDeleted} | old unedited starters deactivated: ${r.legacyDeactivated} | edited old starters kept: ${r.legacyKept}`);
       if (r.droppedIndexes?.length) console.log(`  replaced old index: ${r.droppedIndexes.join(', ')}`);
-      console.log(`  default-template repairs: ${r.defaultsFixed}${r.noop ? ' | nothing to change' : ''}\n`);
+  console.log(`  default-template repairs: ${r.defaultsFixed}${r.noop ? ' | nothing to change' : ''}\n`);
     })
     .catch((e) => { console.error('Template seed failed:', e.message); process.exitCode = 1; })
     .finally(() => disconnectDB().catch(() => {}));

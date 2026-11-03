@@ -3,6 +3,7 @@ const LeadActivity = require('../models/LeadActivity');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const { getPreferences } = require('../services/settingsService');
+const { withOwner } = require('../utils/scope');
 const { buildLeadFilter, buildSort } = require('../utils/leadFilter');
 const { parsePagination, pageMeta } = require('../utils/pagination');
 
@@ -12,37 +13,11 @@ const { trackNoPhone } = require('../services/settingsService');
 // Phone / validation failures come back as 400 with a stable `code` and the offending field.
 const validationError = (r) => new ApiError(400, r.message, [{ field: r.field, message: r.message }], r.code);
 
-async function findDuplicates(data, excludeId) {
-  const or = [];
-  if (data.placeId) or.push({ placeId: data.placeId });
-  if (data.phoneNormalized) or.push({ phoneNormalized: data.phoneNormalized });
-  if (data.nameKey) or.push({ nameKey: data.nameKey, cityKey: data.cityKey || '' });
-  if (!or.length) return [];
-  const q = { $or: or };
-  if (excludeId) q._id = { $ne: excludeId };
-  return Lead.find(q).select('businessName phone city status placeId').limit(5).lean();
-}
-
-// The single place a new lead is written. Manual create, Google Places saves and bulk import ALL go through here.
-async function createLeadFrom(input, { prefs, user, force = false }) {
-  const prepared = prepareNewLead(input, prefs);
-  if (!prepared.ok) return { outcome: 'rejected', error: prepared };
-  const data = prepared.data;
-  if (data.placeId) { data.placeIdSavedAt = new Date(); if (!input.dataSource) data.dataSource = 'google_places_reference'; }
-  if (!force) {
-    const duplicates = await findDuplicates(data);
-    if (duplicates.length) return { outcome: 'duplicate', duplicates };
-  }
-  const lead = new Lead({ ...data, createdBy: user._id });
-  lead.$locals.defaultCountryCode = prefs.defaultCountryCode;
-  await lead.save();
-  await LeadActivity.create({ lead: lead._id, type: 'created', message: `Lead created (${lead.dataSource.replace(/_/g, ' ')})`, createdBy: user._id });
-  return { outcome: 'created', lead, warning: prepared.warning };
-}
+const { findDuplicates, createLeadFrom } = require('../services/leadWriter');
 
 exports.list = asyncHandler(async (req, res) => {
   const { page, limit, skip } = parsePagination(req.query, 20, 200);
-  const filter = buildLeadFilter(req.query);
+  const filter = withOwner(req.user, buildLeadFilter(req.query));
   const [data, total] = await Promise.all([
     Lead.find(filter).sort(buildSort(req.query)).collation({ locale: 'en', strength: 2 }).skip(skip).limit(limit).lean(),
     Lead.countDocuments(filter),
@@ -51,12 +26,12 @@ exports.list = asyncHandler(async (req, res) => {
 });
 
 exports.meta = asyncHandler(async (req, res) => {
-  const [categories, cities] = await Promise.all([Lead.distinct('category'), Lead.distinct('city')]);
+  const [categories, cities] = await Promise.all([Lead.distinct('category', withOwner(req.user)), Lead.distinct('city', withOwner(req.user))]);
   res.json({ categories: categories.filter(Boolean).sort(), cities: cities.filter(Boolean).sort() });
 });
 
 exports.create = asyncHandler(async (req, res) => {
-  const prefs = await getPreferences();
+  const prefs = await getPreferences(req.user);
   const r = await createLeadFrom(req.body, { prefs, user: req.user, force: Boolean(req.body.force) });
   if (r.outcome === 'rejected') {
     if (r.error.code === 'PHONE_REQUIRED') await trackNoPhone({ rejectedSaves: 1 });
@@ -68,13 +43,13 @@ exports.create = asyncHandler(async (req, res) => {
 
 // Bulk save (Google Places "save selected / save all", imports). Records without a valid phone number are skipped and reported.
 exports.importMany = asyncHandler(async (req, res) => {
-  const prefs = await getPreferences();
+  const prefs = await getPreferences(req.user);
   const { leads, defaults = {}, force = false } = req.body;
   if (!Array.isArray(leads) || !leads.length) throw new ApiError(400, 'Provide a non-empty "leads" array');
   if (leads.length > MAX_IMPORT) throw new ApiError(400, `Import at most ${MAX_IMPORT} leads per request`);
   const items = leads.map((l) => ({ ...defaults, ...l }));
   const out = await importLeads(items, {
-    prefs, force: Boolean(force), findDuplicates,
+    prefs, force: Boolean(force), findDuplicates: (d) => findDuplicates(d, undefined, req.user),
     createLead: async (data) => {
       const r = await createLeadFrom(data, { prefs, user: req.user, force: true }); // duplicates were already checked by importLeads
       if (r.outcome !== 'created') throw new Error(r.error?.message || 'Could not save lead');
@@ -86,21 +61,21 @@ exports.importMany = asyncHandler(async (req, res) => {
 });
 
 exports.get = asyncHandler(async (req, res) => {
-  const lead = await Lead.findById(req.params.id).lean();
+  const lead = await Lead.findOne(withOwner(req.user, { _id: req.params.id })).lean();
   if (!lead) throw new ApiError(404, 'Lead not found');
   const activities = await LeadActivity.find({ lead: lead._id }).sort({ createdAt: -1 }).limit(100).lean();
   res.json({ data: lead, activities });
 });
 
 exports.update = asyncHandler(async (req, res) => {
-  const lead = await Lead.findById(req.params.id);
+  const lead = await Lead.findOne(withOwner(req.user, { _id: req.params.id }));
   if (!lead) throw new ApiError(404, 'Lead not found');
-  const prefs = await getPreferences();
+  const prefs = await getPreferences(req.user);
   const prepared = prepareLeadUpdate(req.body, lead, prefs);
   if (!prepared.ok) throw validationError(prepared);
   const { patch } = prepared;
   if (!req.body.force) {
-    const dupes = await findDuplicates({ nameKey: patch.nameKey ?? lead.nameKey, cityKey: patch.cityKey ?? lead.cityKey, phoneNormalized: patch.phoneNormalized, placeId: patch.placeId }, lead._id);
+    const dupes = await findDuplicates({ nameKey: patch.nameKey ?? lead.nameKey, cityKey: patch.cityKey ?? lead.cityKey, phoneNormalized: patch.phoneNormalized, placeId: patch.placeId }, lead._id, req.user);
     if (dupes.length) return res.status(409).json({ message: 'Another lead matches these details', duplicates: dupes });
   }
   const prevStatus = lead.status;
@@ -119,14 +94,14 @@ exports.update = asyncHandler(async (req, res) => {
 });
 
 exports.remove = asyncHandler(async (req, res) => {
-  const lead = await Lead.findByIdAndDelete(req.params.id);
+  const lead = await Lead.findOneAndDelete(withOwner(req.user, { _id: req.params.id }));
   if (!lead) throw new ApiError(404, 'Lead not found');
   await LeadActivity.deleteMany({ lead: lead._id });
   res.json({ message: 'Lead deleted' });
 });
 
 exports.setStatus = asyncHandler(async (req, res) => {
-  const lead = await Lead.findById(req.params.id);
+  const lead = await Lead.findOne(withOwner(req.user, { _id: req.params.id }));
   if (!lead) throw new ApiError(404, 'Lead not found');
   const prev = lead.status;
   lead.status = req.body.status;
@@ -136,7 +111,9 @@ exports.setStatus = asyncHandler(async (req, res) => {
 });
 
 exports.bulkUpdate = asyncHandler(async (req, res) => {
-  const { ids, action } = req.body;
+  const { action } = req.body;
+  // Only the caller's own leads can be touched, whatever ids were sent.
+  const ids = (await Lead.find(withOwner(req.user, { _id: { $in: req.body.ids } })).select('_id').lean()).map((l) => l._id);
   let affected = 0;
   if (action === 'delete') {
     affected = (await Lead.deleteMany({ _id: { $in: ids } })).deletedCount;

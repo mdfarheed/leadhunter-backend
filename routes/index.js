@@ -1,7 +1,7 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const v = require('../validators');
-const { protect } = require('../middleware/auth');
+const { protect, adminOnly } = require('../middleware/auth');
 const auth = require('../controllers/authController');
 const dash = require('../controllers/dashboardController');
 const places = require('../controllers/placesController');
@@ -11,6 +11,8 @@ const act = require('../controllers/activityController');
 const hist = require('../controllers/searchHistoryController');
 const exp = require('../controllers/exportController');
 const settings = require('../controllers/settingsController');
+const users = require('../controllers/userController');
+const visits = require('../controllers/visitController');
 const cats = require('../controllers/categoryController');
 
 const r = express.Router();
@@ -50,10 +52,10 @@ r.patch('/leads/:id/status', v.leadStatus, leads.setStatus);
 r.get('/templates', tpl.list);
 r.get('/templates/next', v.rotationNext, tpl.next);
 r.post('/templates/rotation/used', v.rotationUsed, tpl.markUsed);
-r.post('/templates', v.templateCreate, tpl.create);
-r.put('/templates/:id', v.templateUpdate, tpl.update);
-r.delete('/templates/:id', v.idParam, tpl.remove);
-r.patch('/templates/:id/default', v.idParam, tpl.setDefault);
+r.post('/templates', adminOnly, v.templateCreate, tpl.create);
+r.put('/templates/:id', adminOnly, v.templateUpdate, tpl.update);
+r.delete('/templates/:id', adminOnly, v.idParam, tpl.remove);
+r.patch('/templates/:id/default', adminOnly, v.idParam, tpl.setDefault);
 
 r.get('/activities', act.list);
 r.post('/activities', v.activityCreate, act.create);
@@ -65,13 +67,26 @@ r.delete('/search-history/:id', v.idParam, hist.remove);
 r.delete('/search-history', hist.clear);
 
 r.get('/categories', cats.list);
-r.post('/categories', v.category, cats.create);
-r.put('/categories/:id', v.categoryUpdate, cats.update);
-r.delete('/categories/:id', v.idParam, cats.remove);
+r.post('/categories', adminOnly, v.category, cats.create);
+r.put('/categories/:id', adminOnly, v.categoryUpdate, cats.update);
+r.delete('/categories/:id', adminOnly, v.idParam, cats.remove);
 
 r.get('/export/leads', exp.json);
 r.get('/export/leads/csv', exp.csv);
 r.get('/export/leads/excel', exp.excel);
+
+// users: administrator only
+r.get('/users', adminOnly, users.list);
+r.post('/users', adminOnly, v.userCreate, users.create);
+r.patch('/users/:id', adminOnly, v.userUpdate, users.update);
+r.delete('/users/:id', adminOnly, v.idParam, users.remove);
+
+// visit personally
+r.get('/visits', visits.list);
+r.post('/visits', v.visitCreate, visits.create);
+r.put('/visits/:id', v.visitUpdate, visits.update);
+r.delete('/visits/:id', v.idParam, visits.remove);
+r.post('/visits/:id/convert', v.visitConvert, visits.convert);
 
 r.get('/settings', settings.get);
 r.put('/settings', v.settingsUpdate, settings.update);

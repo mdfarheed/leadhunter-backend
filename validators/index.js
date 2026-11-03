@@ -126,7 +126,7 @@ exports.category = [
 exports.categoryUpdate = [mongoId(), ...exports.category.slice(0, -1), validate];
 
 exports.settingsUpdate = [
-  optStr('profile.name', 100), body('profile.email').optional().isEmail().normalizeEmail(), optStr('profile.developerName', 100),
+  optStr('profile.name', 100), body('profile.email').optional().isEmail().normalizeEmail(), optStr('profile.developerName', 100), optStr('profile.city', 100),
   body('preferences.defaultCountryCode').optional().matches(/^\d{1,4}$/).withMessage('Country code must be digits'),
   optStr('preferences.defaultCountry', 100), optStr('preferences.defaultState', 100), optStr('preferences.defaultCity', 100),
   body('preferences.defaultTemplateId').optional({ nullable: true, checkFalsy: true }).isMongoId(),
@@ -135,3 +135,36 @@ exports.settingsUpdate = [
 
 exports.rotationNext = [query('category').isIn(TEMPLATE_CATEGORIES).withMessage('Invalid template category'), validate];
 exports.rotationUsed = [body('templateId').isMongoId().withMessage('Invalid template id'), validate];
+
+// ---- users (admin only) ----
+const newPassword = (field) => body(field).isString().isLength({ min: 8, max: 100 }).withMessage('Password must be 8-100 characters')
+  .matches(/[A-Za-z]/).withMessage('Password needs a letter').matches(/\d/).withMessage('Password needs a number');
+exports.userCreate = [
+  body('name').isString().trim().notEmpty().withMessage('Name is required').isLength({ max: 100 }),
+  body('email').isEmail().withMessage('Valid email required').normalizeEmail(),
+  newPassword('password'),
+  body('city').isString().trim().notEmpty().withMessage('City is required').isLength({ max: 100 }),
+  optStr('developerName', 100),
+  validate,
+];
+exports.userUpdate = [
+  mongoId(),
+  body('name').optional().isString().trim().notEmpty().isLength({ max: 100 }),
+  body('city').optional().isString().trim().notEmpty().withMessage('City cannot be empty').isLength({ max: 100 }),
+  optStr('developerName', 100),
+  body('active').optional().isBoolean().withMessage('active must be true/false'),
+  body('newPassword').optional().custom((v) => { if (typeof v !== 'string' || v.length < 8 || !/[A-Za-z]/.test(v) || !/\d/.test(v)) throw new Error('Password must be 8+ characters with letters and numbers'); return true; }),
+  validate,
+];
+
+// ---- visit personally ----
+const visitFields = [
+  optStr('name', 150), optStr('city', 100), optStr('comment', 1000),
+  body('visitDate').optional({ nullable: true, checkFalsy: true }).isISO8601().withMessage('Invalid visit date'),
+];
+exports.visitCreate = [
+  body('phone').custom((value) => { const r = checkPhone(value); if (!r.ok) throw new Error(r.message); return true; }),
+  ...visitFields, validate,
+];
+exports.visitUpdate = [mongoId(), optStr('phone', 40), ...visitFields, body('status').optional().isIn(['pending', 'visited']).withMessage('Invalid status'), validate];
+exports.visitConvert = [mongoId(), optStr('businessName', 200), optStr('category', 100), validate];

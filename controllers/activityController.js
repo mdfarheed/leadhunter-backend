@@ -3,10 +3,11 @@ const LeadActivity = require('../models/LeadActivity');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const { parsePagination, pageMeta } = require('../utils/pagination');
+const { withOwner, ownerFilter } = require('../utils/scope');
 
 exports.list = asyncHandler(async (req, res) => {
   const { page, limit, skip } = parsePagination(req.query, 25);
-  const filter = {};
+  const filter = ownerFilter(req.user); // activities the signed-in user recorded
   if (req.query.type) filter.type = req.query.type;
   if (req.query.lead && /^[a-f\d]{24}$/i.test(req.query.lead)) filter.lead = req.query.lead;
   const [data, total] = await Promise.all([
@@ -17,6 +18,7 @@ exports.list = asyncHandler(async (req, res) => {
 });
 
 exports.byLead = asyncHandler(async (req, res) => {
+  if (!(await Lead.exists(withOwner(req.user, { _id: req.params.leadId })))) throw new ApiError(404, 'Lead not found');
   const data = await LeadActivity.find({ lead: req.params.leadId }).sort({ createdAt: -1 }).limit(200).lean();
   res.json({ data });
 });
@@ -24,7 +26,7 @@ exports.byLead = asyncHandler(async (req, res) => {
 // Side effects happen ONLY here, when the user explicitly records an action (e.g. confirms they contacted the business).
 exports.create = asyncHandler(async (req, res) => {
   const { lead: leadId, type, message = '', nextFollowUpAt } = req.body;
-  const lead = await Lead.findById(leadId);
+  const lead = await Lead.findOne(withOwner(req.user, { _id: leadId }));
   if (!lead) throw new ApiError(404, 'Lead not found');
   let text = message.trim();
 
